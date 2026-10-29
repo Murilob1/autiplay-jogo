@@ -6,10 +6,10 @@
 <title>Aventura da Rotina</title>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#6c7f7c;--card:#fffdf6;--line:#c9d8d2;--accent:#e5894f;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
-:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#7a7194;--card:#fffafc;--line:#d6cce8;--accent:#d9778f;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
-:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
+:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#4f625f;--onaccent:#2b2118;--edge:#6f857f;--card:#fffdf6;--line:#c9d8d2;--accent:#e5894f;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
+:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#5a5278;--onaccent:#2b2118;--edge:#847a9e;--card:#fffafc;--line:#d6cce8;--accent:#d9778f;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
+:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
 html,body{height:100%;margin:0}
 *{box-sizing:border-box}
 body{background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:400 calc(18px*var(--fs,1))/1.5 Lexend,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
@@ -17,9 +17,9 @@ h1,h2{margin:0;font-weight:600}
 #app{position:fixed;inset:0;overflow-y:auto;padding:env(safe-area-inset-top,0px) 0 130px}
 button{font:inherit;cursor:pointer;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:10px 16px;min-height:52px}
 button:focus-visible,input:focus-visible{outline:4px solid var(--ok);outline-offset:2px}
-button.go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;font-size:1.1em;box-shadow:0 5px 0 rgba(0,0,0,.15)}
+button.go{background:var(--accent);border-color:var(--accent);color:var(--onaccent);font-weight:600;font-size:1.1em;box-shadow:0 5px 0 rgba(0,0,0,.15)}
 button.go:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
-input{font:inherit;width:100%;border:3px solid var(--line);border-radius:16px;padding:10px 12px;background:var(--card);color:var(--ink);min-height:52px}
+input{font:inherit;width:100%;border:3px solid var(--edge);border-radius:16px;padding:10px 12px;background:var(--card);color:var(--ink);min-height:52px}
 .center{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 18px;text-align:center}
 .hero-big{font-size:6.5rem;line-height:1}
 .hud{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--sky2) 40%)}
@@ -50,7 +50,7 @@ ol.steps{margin:6px 0 0;padding-left:22px}
 .sub{color:var(--soft);margin:0}
 .pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .garden{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;max-width:460px}.gd{aspect-ratio:1;border-radius:14px;background:var(--card);border:3px dashed var(--line);display:grid;place-items:center;font-size:1.5rem}.gd.on{border-style:solid;border-color:var(--ok)}.gd.today{border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
-:root[data-contrast]{--ink:#000;--soft:#222;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
+:root[data-contrast]{--ink:#000;--soft:#222;--onaccent:#fff;--edge:#000;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
 @media print{body{overflow:visible;background:#fff}#app{position:static;overflow:visible;padding:0}.noprint,button,.hud,.top{display:none!important}.pcards{grid-template-columns:repeat(3,1fr)}.pc{border:3px solid #000;border-radius:16px;text-align:center;break-inside:avoid;background:#fff;color:#000}}
 </style>
 </head>
@@ -68,7 +68,7 @@ const MISH=[
 const DEF=[["⏰","Acordar"],["🪥","Escovar os dentes"],["🥣","Tomar café"],["🎒","Arrumar a mochila"],["🏫","Ir para a escola"],["🏠","Voltar para casa"]];
 const uid=()=>Math.random().toString(36).slice(2,8);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],owned:[],showStreak:true};
+let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],owned:[],showStreak:true,consent:false};
 const KEY="aventura-jogo-v1";
 try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)}}catch(e){console.warn("Storage vazio",e)}
 let V={screen:"title",undo:null,net:{ready:false,busy:false,uid:null,profile:null,friends:[],reqs:[],msg:""},paused:false,done:false,fork:null,prev:null,msg:"",draft:{e:EM[0],t:""}};
@@ -85,7 +85,7 @@ function mapHtml(){
   if(c>0)s+=`<path d="${segPath(c)}" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" opacity=".8"/>`;
   const all=[...S.cards,{e:"🏁",t:"Fim do dia",done:false,goal:true}];
   all.forEach((k,i)=>{const p=pos(i),now=i===c,done=k.done;
-    s+=`<g ${now&&!k.goal||k.goal&&c===n?'role="button" tabindex="0" data-act="open"':""} style="cursor:pointer">${now?`<circle class="ring" cx="${p.x}" cy="${p.y}" r="42" fill="none" stroke="var(--accent)" stroke-width="5"/>`:""}<circle cx="${p.x}" cy="${p.y}" r="32" fill="${done?"var(--ok)":"var(--card)"}" stroke="${now?"var(--accent)":"var(--line)"}" stroke-width="4"/><text x="${p.x}" y="${p.y+11}" font-size="32" text-anchor="middle" opacity="${done||now||k.goal?1:.55}">${done?"⭐":k.e}</text><text x="${p.x}" y="${p.y+58}" font-size="14" text-anchor="middle" fill="var(--ink)">${esc(k.t)}</text></g>`});
+    s+=`<g ${!k.goal&&!done?`role="button" tabindex="0" data-act="open" data-i="${i}" aria-label="${esc(k.t)}"`:(k.goal&&c===n?'role="button" tabindex="0" data-act="open"':"")} style="cursor:pointer">${now?`<circle class="ring" cx="${p.x}" cy="${p.y}" r="42" fill="none" stroke="var(--accent)" stroke-width="5"/>`:""}<circle cx="${p.x}" cy="${p.y}" r="32" fill="${done?"var(--ok)":"var(--card)"}" stroke="${now?"var(--accent)":"var(--line)"}" stroke-width="4"/><text x="${p.x}" y="${p.y+11}" font-size="32" text-anchor="middle" opacity="${done||now||k.goal?1:.55}">${done?"⭐":k.e}</text><text x="${p.x}" y="${p.y+58}" font-size="14" text-anchor="middle" fill="var(--ink)">${esc(k.t)}</text></g>`});
   const from=pos(V.prev!=null?V.prev:c),to=pos(c);
   s+=`<g class="hero" id="hero" style="transform:translate(${from.x+30}px,${from.y-56}px)"><text font-size="40" text-anchor="middle">${S.mascot}</text></g></svg>`;
   return s;
@@ -94,15 +94,16 @@ function viewMap(){
   const c=cur(),n=S.cards.length,fin=c>=n;
   return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">🌱 ${S.seeds} · 🌻 Jardim</button><button data-act="village" aria-label="Vilarejo">🏘️</button><button data-act="edit">✎ Meu mapa</button></div>
   ${V.undo?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Caminho novo criado <button data-act="undo" style="min-height:40px;padding:4px 12px">Desfazer</button></span></div>`:""}
+  ${V.hint?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Toque em qualquer parada para fazer primeiro</span></div>`:""}
   ${mapHtml()}
   <div class="hud"><button data-act="pause" aria-label="Pausa">⏸ Pausa</button>
   <button class="go" data-act="open">${fin?"🏁 Terminar o dia":`▶ Vamos! ${esc(S.cards[c].t)}`}</button>
   <button data-act="mish" aria-label="Mudou algo">☁️</button><button data-act="cfg" aria-label="Ajustes">⚙</button></div>`;
 }
 function viewScene(){
-  const c=cur(),n=S.cards.length;
+  const n=S.cards.length,c=V.done&&V.last!=null?V.last:(V.sel!=null?V.sel:cur());
   if(c>=n)return `<div class="center pop"><div class="stage">🏁</div><div class="bubble"><b>${S.mascot} Você chegou ao fim do dia!</b><p class="sub">Todas as paradas estão feitas. Quando quiser, comece outro dia.</p></div><button class="go" data-act="newday">Começar outro dia</button><button data-act="map">Voltar ao mapa</button></div>`;
-  const k=S.cards[c],next=S.cards[c+1];
+  const k=S.cards[c],next=S.cards.find((x,j)=>!x.done&&j!==c);
   if(V.done)return `<div class="center pop"><div class="stage">⭐</div><div class="bubble"><b>${S.mascot} Muito bem!</b><p class="sub">Você terminou: ${esc(k.t)}. +1 🌱</p><p class="sub">${next?`Próxima parada: ${next.e} ${esc(next.t)}`:"Próxima parada: 🏁 Fim do dia"}</p></div><button class="go" data-act="cont">Continuar o mapa</button></div>`;
   return `<div class="center pop"><div class="stage" aria-hidden="true">${k.e}</div><div class="bubble"><b>${S.mascot} Parada ${c+1} de ${n}: ${esc(k.t)}</b><ol class="steps"><li>Faça esta etapa no seu tempo.</li><li>Quando terminar, toque em “Fiz!”.</li></ol><p class="sub">Depois: ${next?`${next.e} ${esc(next.t)}`:"🏁 Fim do dia"}</p></div>
   <button class="go" data-act="did">✔ Fiz!</button>${S.voice?`<button data-act="say">🔊 Ouvir</button>`:""}<button data-act="map">← Voltar ao mapa</button><p class="sub">Sem pressa. Não tem tempo limite.</p></div>`;
@@ -110,7 +111,7 @@ function viewScene(){
 function viewMish(){
   if(V.fork==null)return `<div class="center"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer.</p></div>${MISH.map((m,i)=>`<button class="opt card" data-act="fork" data-i="${i}"><span class="e">${m.e}</span>${m.t}</button>`).join("")}<button data-act="map">← Voltar ao mapa</button></div>`;
   const m=MISH[V.fork];
-  return `<div class="center pop"><div class="stage" style="font-size:5rem">${m.e}</div><div class="bubble"><b>${S.mascot} ${m.t}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${o[0]}</span>${o[1]}</button>`).join("")}<button data-act="map">← Voltar ao mapa</button></div>`;
+  return `<div class="center pop"><div class="stage" style="font-size:5rem">${m.e}</div><div class="bubble"><b>${S.mascot} ${m.t}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${o[0]}</span>${o[1]}</button>`).join("")}<button class="opt card" data-act="reorder"><span class="e">🔀</span>Fazer outra parada primeiro</button><button data-act="map">← Voltar ao mapa</button></div>`;
 }
 function viewEdit(){
   const d=V.draft;
@@ -221,6 +222,7 @@ async function friendAction(fn,fid){
 function viewVillage(){
   const n=V.net,back='<button data-act="map">← Voltar ao mapa</button>',msg=n.msg?`<div class="bubble">${esc(n.msg)}</div>`:"";
   const wrap=b=>`<div class="center pop" style="justify-content:flex-start;padding-top:70px"><h1>🏘️ Vilarejo</h1>${msg}${b}${back}</div>`;
+  if(!S.consent)return wrap('<div class="card"><b>Antes de entrar</b><ul style="padding-left:20px;margin:8px 0"><li>O Vilarejo é opcional. Você pode jogar sem ele.</li><li>Use só um apelido, nunca o nome completo, endereço, escola ou telefone.</li><li>Se você tem menos de 18 anos, peça permissão a um responsável.</li><li>Só os amigos que você aceitar veem seu apelido. O progresso só aparece se você deixar.</li></ul><button class="go" data-act="consent">Tenho permissão e quero entrar</button></div>');
   if(n.busy)return wrap('<p class="sub">Entrando no vilarejo…</p>');
   if(!n.ready)return wrap('<button class="go" data-act="village">Tentar de novo</button>');
   if(!n.profile)return wrap(`<div class="card"><b>Crie seu perfil</b><p class="sub">Use um apelido, não o seu nome completo. Seu personagem ${esc(S.mascot)} vai aparecer para seus amigos.</p><input id="nick" maxlength="20" placeholder="Apelido" style="margin:8px 0"><button class="go" data-act="mkprofile">Criar perfil</button></div>`);
@@ -253,21 +255,23 @@ function render(){
     const svg=app.querySelector("svg");if(svg){const y=(pos(cur()).y/svg.viewBox.baseVal.height)*svg.getBoundingClientRect().height;app.scrollTop=Math.max(0,y-innerHeight/2)}
   }
 }
-const go=s=>{V.screen=s;V.done=false;V.fork=null;V.paused=false};
+const go=s=>{V.screen=s;V.sel=null;V.done=false;V.fork=null;V.paused=false};
 function move(id,d){const i=S.cards.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.cards.length)return;[S.cards[i],S.cards[j]]=[S.cards[j],S.cards[i]]}
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("[data-act]");if(!b)return;
   const a=b.dataset.act,id=b.dataset.id,i=+b.dataset.i,t=document.getElementById("txt");if(t)V.draft.t=t.value;
-  if(a==="map"){go("map")}else if(a==="open")go("scene");
-  else if(a==="did"){V.undo=null;S.cards[cur()].done=true;S.stars++;S.seeds++;markDay();V.done=true}
+  if(a==="map"){go("map")}else if(a==="open"){V.hint=false;go("scene");V.sel=b.dataset.i!=null?+b.dataset.i:null}
+  else if(a==="did"){V.undo=null;const i2=V.sel!=null?V.sel:cur();S.cards[i2].done=true;V.last=i2;V.sel=null;S.stars++;S.seeds++;markDay();V.done=true}
   else if(a==="cont")go("map");
   else if(a==="newday"){S.cards.forEach(c=>c.done=false);go("map");V.prev=null}
   else if(a==="pause")V.paused=true;else if(a==="resume")V.paused=false;
   else if(a==="title")go("title");
   else if(a==="mish")go("mish");else if(a==="fork")V.fork=i;
+  else if(a==="reorder"){markDay();go("map");V.hint=true}
   else if(a==="goprint")go("print");else if(a==="why")go("why");
   else if(a==="garden")go("garden");
-  else if(a==="village"){go("village");netInit()}
+  else if(a==="village"){go("village");if(S.consent)netInit()}
+  else if(a==="consent"){S.consent=true;netInit()}
   else if(a==="mkprofile"){createProfile();return}
   else if(a==="share"){setShare(b.dataset.v==="1");return}
   else if(a==="addf"){addFriend();return}
@@ -292,6 +296,7 @@ document.addEventListener("click",ev=>{
 });
 document.addEventListener("keydown",ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.getAttribute&&ev.target.getAttribute("role")==="button"){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
 document.addEventListener("input",ev=>{if(ev.target.id==="txt")V.draft.t=ev.target.value});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&V.paused){V.paused=false;render()}});
 render();
 </script>
 </body>
