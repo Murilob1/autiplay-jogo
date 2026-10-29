@@ -98,7 +98,7 @@ const MISH=[
 const DEF=[["⏰","Acordar"],["🪥","Escovar os dentes"],["🥣","Tomar café"],["🎒","Arrumar a mochila"],["🏫","Ir para a escola"],["🏠","Voltar para casa"]];
 const uid=()=>Math.random().toString(36).slice(2,8);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],act:[],owned:[],showStreak:false,showNext:false,gmode:"simple",consent:false};
+let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],act:[],owned:[],showStreak:false,showNext:false,gmode:"simple",consent:false,ai:false};
 const KEY="aventura-jogo-v1";
 try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)}}catch(e){console.warn("Storage vazio",e)}
 if(!S.mish)S.mish=JSON.parse(JSON.stringify(MISH));
@@ -162,9 +162,9 @@ function viewScene(){
 }
 const IM=["🕒","🌧️","👩‍🏫","🚌","🔔","🤒","🎉","🔊","🚧","📅","🍽️","🧪"];
 function viewMish(){
-  if(V.fork==null)return `<div class="center" style="justify-content:flex-start;padding-top:70px"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer, ou crie o seu.</p></div>${S.mish.map((m,i)=>`<div class="row" style="width:100%;max-width:460px;flex-wrap:nowrap"><button class="opt card" style="flex:1;width:auto" data-act="fork" data-i="${i}"><span class="e">${esc(m.e)}</span>${esc(m.t)}</button><button data-act="medit" data-i="${i}" aria-label="Editar imprevisto">✎</button><button data-act="mdel" data-i="${i}" aria-label="Apagar imprevisto">🗑</button></div>`).join("")}<button class="go" data-act="mnew">➕ Criar meu imprevisto</button><button data-act="mreset">↺ Recuperar os originais</button><button data-act="map">← Voltar ao mapa</button></div>`;
-  const m=S.mish[V.fork];
-  return `<div class="center pop"><div class="stage" style="font-size:5rem">${esc(m.e)}</div><div class="bubble"><b>${S.mascot} ${esc(m.t)}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${esc(o[0])}</span>${esc(o[1])}</button>`).join("")}<button class="opt card" data-act="reorder"><span class="e">🔀</span>Fazer outra parada primeiro</button><button data-act="mish">← Voltar aos imprevistos</button></div>`;
+  if(V.fork==null)return `<div class="center" style="justify-content:flex-start;padding-top:70px"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer, ou crie o seu.</p></div>${S.mish.map((m,i)=>`<div class="row" style="width:100%;max-width:460px;flex-wrap:nowrap"><button class="opt card" style="flex:1;width:auto" data-act="fork" data-i="${i}"><span class="e">${esc(m.e)}</span>${esc(m.t)}</button><button data-act="medit" data-i="${i}" aria-label="Editar imprevisto">✎</button><button data-act="mdel" data-i="${i}" aria-label="Apagar imprevisto">🗑</button></div>`).join("")}<button class="go" data-act="aiopen">✨ Descrever o que mudou</button><button data-act="mnew">➕ Criar meu imprevisto</button><button data-act="mreset">↺ Recuperar os originais</button><button data-act="map">← Voltar ao mapa</button></div>`;
+  const m=V.aiItem||S.mish[V.fork];
+  return `<div class="center pop"><div class="stage" style="font-size:5rem">${esc(m.e)}</div><div class="bubble"><b>${S.mascot} ${esc(m.t)}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p>${V.aiItem?'<p class="sub">Sugestões feitas por IA. Você escolhe.</p>':""}</div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${esc(o[0])}</span>${esc(o[1])}</button>`).join("")}${V.aiItem?(V.aisaved?'<p class="sub">Guardado na sua lista.</p>':'<button data-act="aisave">💾 Guardar na minha lista</button>'):""}<button class="opt card" data-act="reorder"><span class="e">🔀</span>Fazer outra parada primeiro</button><button data-act="mish">← Voltar aos imprevistos</button></div>`;
 }
 function viewMform(){
   const f=V.mform;
@@ -174,6 +174,32 @@ function viewMform(){
   <div class="card"><b>Opções para seguir</b><p class="sub">Escreva de 1 a 3. Todas são válidas.</p>${f.o.map((o,k)=>`<div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="me${k}" maxlength="8" value="${esc(o[0])}" aria-label="Desenho da opção ${k+1}" style="width:72px;text-align:center"><input id="mo${k}" maxlength="40" value="${esc(o[1])}" placeholder="Opção ${k+1}" style="flex:1"></div>`).join("")}</div>
   ${V.mmsg?`<div class="bubble">${esc(V.mmsg)}</div>`:""}
   <button class="go" data-act="msave">Salvar</button><button data-act="mish">Cancelar</button></div>`;
+}
+const CARE="Parece que isso é difícil. Vale falar agora com um adulto de confiança. Se precisar de ajuda urgente, o CVV atende pelo 188.";
+const DISTRESS=/\b(medo|nao aguento|me machuc\w*|morrer|suicid\w*|me matar|apanh\w*|abus\w*)\b/;
+const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+function viewAi(){
+  const wrap=b=>`<div class="center pop" style="justify-content:flex-start;padding-top:70px">${b}</div>`;
+  if(!S.ai)return wrap('<h1>✨ Ajuda para pensar</h1><div class="card"><b>Antes de usar</b><ul style="padding-left:20px;margin:8px 0"><li>É opcional. Você pode usar só a lista de imprevistos.</li><li>A frase que você escrever é enviada a um serviço de IA, que sugere opções.</li><li>Não escreva nomes, endereços, telefone nem escola.</li><li>A IA só sugere. Quem escolhe é você.</li></ul><button class="go" data-act="aiyes">Entendi, quero usar</button></div><button data-act="mish">Agora não</button>');
+  return wrap(`<div class="bubble"><b>${S.mascot} O que mudou?</b><p class="sub">Escreva em poucas palavras. Eu sugiro opções para você escolher.</p></div>${V.aimsg?`<div class="bubble" role="status">${esc(V.aimsg)}</div>`:""}<div class="card"><label class="sub" for="aitext">O que mudou?</label><input id="aitext" maxlength="60" value="${esc(V.aitext||"")}" placeholder="Ex.: A professora faltou" ${V.aibusy?"disabled":""}></div><button class="go" data-act="aigo" ${V.aibusy?"disabled":""}>${V.aibusy?"Pensando…":"Ver opções"}</button><button data-act="mish">← Voltar aos imprevistos</button>`);
+}
+async function askAi(){
+  const inp=document.getElementById("aitext"),text=((inp&&inp.value)||"").trim().replace(/\s+/g," ").slice(0,60);
+  V.aitext=text;
+  if(text.length<4){V.aimsg="Escreva em poucas palavras o que mudou.";return render()}
+  if(/\d{3,}|@|https?:|www\./i.test(text)){V.aimsg="Escreva sem números, endereços ou contatos.";return render()}
+  if(DISTRESS.test(norm(text))){V.aimsg=CARE;return render()}
+  V.aibusy=true;V.aimsg="";render();
+  const FAIL="Não consegui agora. Você pode escolher um imprevisto da lista ou criar o seu.";
+  try{
+    const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),12000);
+    const r=await fetch("/api/imprevisto",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text}),signal:ctl.signal});
+    clearTimeout(timer);
+    const d=await r.json().catch(()=>({}));
+    if(r.ok&&d.item){V.aibusy=false;V.aiItem=d.item;V.aisaved=false;V.fork=-1;V.screen="mish";return render()}
+    V.aimsg=d.error==="care"?CARE:d.error==="fora_do_tema"?"Isso não parece uma mudança no seu dia. Tente descrever o que mudou.":FAIL;
+  }catch(e){console.error("Falha ao pedir opções à IA",e);V.aimsg=FAIL}
+  V.aibusy=false;render();
 }
 function viewEdit(){
   const d=V.draft;
@@ -305,7 +331,7 @@ function viewVillage(){
   <div class="row" style="width:100%;max-width:460px;justify-content:space-between"><h2 style="margin:0">Meus amigos</h2><button data-act="village">🔄 Atualizar</button></div>${reqs}${fr||'<p class="sub">Você ainda não tem amigos no vilarejo.</p>'}`);
 }
 function viewPrint(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1 class="noprint">🖨 Cartões da rotina</h1><p class="sub noprint">Imprima e cole onde quiser. Cada cartão é uma parada.</p><div class="pcards" style="width:100%;max-width:640px">${S.cards.map((c,i)=>`<div class="pc card"><div style="font-size:3rem">${c.e}</div><b>${i+1}. ${esc(c.t)}</b></div>`).join("")}</div><button class="go noprint" data-act="doprint">🖨 Imprimir</button><button class="noprint" data-act="map">← Voltar ao mapa</button></div>`}
-function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. As animações são suaves, o modo calmo para todo movimento e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Sua rotina fica só neste aparelho. No Vilarejo, que é opcional, vão apenas o apelido, o personagem e, se você deixar, o progresso.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
+function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. As animações são suaves, o modo calmo para todo movimento e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>A ajuda da IA é opcional: só a frase curta que você escrever é enviada, e ela só sugere opções.</li><li>Sua rotina fica só neste aparelho. No Vilarejo, que é opcional, vão apenas o apelido, o personagem e, se você deixar, o progresso.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
 function viewPause(){
   return `<div class="center pop" style="position:fixed;inset:0;background:var(--sky1);z-index:20"><div class="breath" aria-hidden="true"></div><div class="bubble"><b>${S.mascot} Pausa.</b><p class="sub">Respire devagar. O jogo espera por você.</p></div><button class="go" data-act="resume">▶ Voltar ao jogo</button><button data-act="title">Sair para o início</button></div>`;
 }
@@ -314,7 +340,7 @@ function viewTitle(){
 }
 function render(){
   look();
-  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden,village:viewVillage,mform:viewMform}[V.screen]();
+  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden,village:viewVillage,mform:viewMform,mai:viewAi}[V.screen]();
   const app=document.getElementById("app");
   app.innerHTML=v+(V.paused?viewPause():"");
   if(V.screen==="map"){
@@ -324,7 +350,7 @@ function render(){
     const svg=app.querySelector("svg");if(svg){const y=(pos(cur()).y/svg.viewBox.baseVal.height)*svg.getBoundingClientRect().height;app.scrollTop=Math.max(0,y-innerHeight/2)}
   }
 }
-const go=s=>{V.screen=s;V.sel=null;V.done=false;V.fork=null;V.paused=false};
+const go=s=>{V.screen=s;V.sel=null;V.done=false;V.fork=null;V.paused=false;V.aiItem=null;V.aisaved=false};
 function move(id,d){const i=S.cards.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.cards.length)return;[S.cards[i],S.cards[j]]=[S.cards[j],S.cards[i]]}
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("[data-act]");if(!b)return;
@@ -354,11 +380,11 @@ document.addEventListener("click",ev=>{
   else if(a==="share"){setShare(b.dataset.v==="1");return}
   else if(a==="addf"){addFriend();return}
   else if(a==="accept"){friendAction("accept_friend",id);return}
-  else if(a==="rmf"){friendAction("remove_friend",id);return}else if(a==="rest")markDay(true);else if(a==="buy")buy(id);else if(a==="streak")S.showStreak=b.dataset.v==="1";else if(a==="gmode")S.gmode=b.dataset.v;else if(a==="shownext")S.showNext=b.dataset.v==="1";
+  else if(a==="rmf"){friendAction("remove_friend",id);return}else if(a==="rest")markDay(true);else if(a==="buy")buy(id);else if(a==="aiopen"){go("mai");V.aimsg="";V.aitext="";V.aibusy=false}else if(a==="aiyes")S.ai=true;else if(a==="aigo"){askAi();return}else if(a==="aisave"){if(V.aiItem&&S.mish.length<12){S.mish.push(JSON.parse(JSON.stringify(V.aiItem)));V.aisaved=true}}else if(a==="streak")S.showStreak=b.dataset.v==="1";else if(a==="gmode")S.gmode=b.dataset.v;else if(a==="shownext")S.showNext=b.dataset.v==="1";
   else if(a==="doprint"){try{window.print()}catch(e){console.warn("Impressão indisponível",e)}}
   else if(a==="say")say("Agora é: "+S.cards[cur()].t);
   else if(a==="undo"){S.cards=JSON.parse(V.undo);V.undo=null}
-  else if(a==="path"){V.undo=JSON.stringify(S.cards);const o=S.mish[V.fork].o[i];markDay();S.cards.splice(Math.min(cur()+1,S.cards.length),0,{id:uid(),e:o[0],t:o[1],done:false});go("map")}
+  else if(a==="path"){V.undo=JSON.stringify(S.cards);const o=(V.aiItem||S.mish[V.fork]).o[i];markDay();S.cards.splice(Math.min(cur()+1,S.cards.length),0,{id:uid(),e:o[0],t:o[1],done:false});go("map")}
   else if(a==="edit")go("edit");else if(a==="cfg")go("cfg");
   else if(a==="up")move(id,-1);else if(a==="dn")move(id,1);
   else if(a==="del")S.cards=S.cards.filter(c=>c.id!==id);
@@ -373,6 +399,7 @@ document.addEventListener("click",ev=>{
   save();render();
 });
 document.addEventListener("keydown",ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.getAttribute&&ev.target.getAttribute("role")==="button"){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Enter"&&ev.target.id==="aitext"&&!V.aibusy){ev.preventDefault();askAi()}});
 document.addEventListener("input",ev=>{if(ev.target.id==="txt")V.draft.t=ev.target.value});
 document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&V.paused){V.paused=false;render()}});
 render();
