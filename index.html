@@ -50,10 +50,16 @@ ol.steps{margin:6px 0 0;padding-left:22px}
 .sub{color:var(--soft);margin:0}
 .top{left:0;right:0;max-width:540px;margin:0 auto;padding:0 12px}
 .map{margin-top:70px;overflow:visible}
+.hero{filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+@media (prefers-color-scheme:dark){:root:not([data-theme]) .deco{filter:brightness(.62) saturate(.85)}}
+:root[data-theme=night] .deco{filter:brightness(.62) saturate(.85)}
 body::before{content:"";position:fixed;left:-10%;right:-10%;bottom:-8vh;height:32vh;background:var(--ground);opacity:.5;border-radius:50% 50% 0 0;z-index:-1}
 .stage{background:radial-gradient(circle at 35% 30%,var(--sky2),var(--card));box-shadow:0 8px 0 var(--line)}
 .bubble:after{content:"";position:absolute;left:28px;bottom:-12px;width:20px;height:20px;background:var(--card);border-right:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(45deg)}
 button:active{transform:translateY(2px)}
+.top .pill,.top button{white-space:nowrap;padding:6px 12px}
+@media (max-width:420px){.top{gap:6px;padding:0 8px}.top .pill,.top button{font-size:.82em;padding:6px 10px}.hud{padding-left:8px;padding-right:8px}.hud button:not(.go){padding:8px 10px}.hud .go{font-size:1em;padding:8px 6px}}
+.hud{gap:8px}.hud .go{flex:1;min-width:0;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hud button:not(.go){flex:none;white-space:nowrap}
 .pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .garden{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;max-width:460px}.gd{aspect-ratio:1;border-radius:14px;background:var(--card);border:3px dashed var(--line);display:grid;place-items:center;font-size:1.5rem}.gd.on{border-style:solid;border-color:var(--ok)}.gd.today{border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
 :root[data-contrast]{--ink:#000;--soft:#222;--onaccent:#fff;--edge:#000;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
@@ -86,9 +92,26 @@ function look(){const r=document.documentElement;S.theme?r.setAttribute("data-th
 function segPath(k){let d=`M${pos(0).x} ${pos(0).y}`;for(let i=1;i<=k;i++){const a=pos(i-1),b=pos(i);d+=` C${a.x} ${a.y+60} ${b.x} ${b.y-60} ${b.x} ${b.y}`}return d}
 function mapHtml(){
   const n=S.cards.length,c=cur(),H=100+(n+1)*125+60;
-  let s=`<svg class="map" viewBox="0 0 360 ${H}" role="img" aria-label="Mapa da aventura"><circle cx="296" cy="30" r="26" fill="#f6c76b" opacity=".9"/>`;
-  for(let i=0;i<=n;i++){const y=pos(i).y;
-    s+=`<ellipse cx="${i%2?-30:390}" cy="${y+50}" rx="120" ry="75" fill="var(--ground)" opacity=".5"/><text x="${i%2?34:326}" y="${y+30}" font-size="32" text-anchor="middle">${i%3?"🌲":"🌳"}</text><text x="${i%2?300:60}" y="${y-34}" font-size="30" text-anchor="middle" opacity=".75">☁️</text><text x="${i%2?96:262}" y="${y+84}" font-size="20" text-anchor="middle">${["🌼","🌷","🌸"][i%3]}</text>`}
+  const DEFS=`<defs>
+<g id="m-tree"><rect x="-5" y="0" width="10" height="26" rx="4" fill="#8b6a4f"/><ellipse cx="0" cy="-4" rx="28" ry="26" fill="#6fae7c"/><ellipse cx="-12" cy="2" rx="18" ry="16" fill="#5c9a6a"/><ellipse cx="10" cy="-12" rx="16" ry="14" fill="#86c291"/><ellipse cx="-4" cy="-17" rx="9" ry="5" fill="#b4dcba" opacity=".7"/></g>
+<g id="m-pine"><rect x="-4" y="8" width="8" height="22" rx="3" fill="#8b6a4f"/><path d="M0-8 L-30 26 H30Z" fill="#6fba95"/><path d="M0-22 L-26 14 H26Z" fill="#5fa886"/><path d="M0-36 L-21 0 H21Z" fill="#4f9577"/></g>
+<g id="m-cloud"><ellipse cx="0" cy="7" rx="36" ry="12" fill="#fff"/><circle cx="-15" cy="-1" r="13" fill="#fff"/><circle cx="6" cy="-8" r="16" fill="#fff"/><circle cx="23" cy="0" r="11" fill="#fff"/></g>
+<g id="m-bush"><ellipse cx="0" cy="0" rx="22" ry="14" fill="#5c9a6a"/><circle cx="-12" cy="-6" r="10" fill="#6fae7c"/><circle cx="8" cy="-8" r="11" fill="#7bbb88"/><circle cx="-6" cy="-10" r="3" fill="#e8908f"/><circle cx="12" cy="-4" r="3" fill="#e8908f"/></g>
+<g id="m-flower"><path d="M0 0 V18" stroke="#5c9a6a" stroke-width="3" stroke-linecap="round"/><g fill="currentColor"><ellipse cy="-7" rx="4.5" ry="6"/><ellipse cy="-7" rx="4.5" ry="6" transform="rotate(72)"/><ellipse cy="-7" rx="4.5" ry="6" transform="rotate(144)"/><ellipse cy="-7" rx="4.5" ry="6" transform="rotate(216)"/><ellipse cy="-7" rx="4.5" ry="6" transform="rotate(288)"/></g><circle r="3.4" fill="#fff6d8"/></g>
+<g id="m-rock"><ellipse rx="15" ry="9" fill="#a9b3ad"/><ellipse cx="-4" cy="-3" rx="7" ry="4" fill="#c4ccc7"/></g>
+<g id="m-pond"><ellipse rx="40" ry="18" fill="#9ccfe0"/><ellipse cx="-8" cy="-3" rx="20" ry="6" fill="#c7e8f1" opacity=".75"/></g>
+</defs>`;
+  const u=(id,x,y,sc=1,st="")=>`<use href="#m-${id}" transform="translate(${x} ${y}) scale(${sc})" style="${st}"/>`;
+  let hs="",ds="";
+  for(let i=0;i<=n;i++){
+    const y=pos(i).y,L=i%2===1;
+    hs+=`<ellipse cx="${L?-30:390}" cy="${y+50}" rx="120" ry="78" fill="var(--ground)" opacity=".45"/><ellipse cx="${L?-10:370}" cy="${y+68}" rx="84" ry="52" fill="var(--ground)" opacity=".5"/>`;
+    ds+=u(i%2?"tree":"pine",L?30:330,y+8,.95)+u(i%2?"pine":"tree",L?326:34,y+60,.8)+u("bush",L?104:256,y+62);
+    if(i%3===1)ds+=u("pond",L?44:316,y+112);
+    else ds+=u("flower",L?60:300,y+92,1,"color:#f4a3b6")+u("flower",L?76:284,y+100,.85,"color:#f6c76b")+u("flower",L?46:314,y+104,.9,"color:#b9a6e8");
+  }
+  ds+=u("cloud",64,40,1,"opacity:.92");
+  let s=`<svg class="map" viewBox="0 0 360 ${H}" role="img" aria-label="Mapa da aventura">${DEFS}${hs}<g class="deco"><circle cx="296" cy="32" r="40" fill="#f6c76b" opacity=".25"/><circle cx="296" cy="32" r="26" fill="#f6c76b" opacity=".95"/>${ds}</g>`;
   const d=segPath(n);
   s+=`<path d="${d}" fill="none" stroke="var(--line)" stroke-width="40" stroke-linecap="round" opacity=".7"/><path d="${d}" fill="none" stroke="var(--path)" stroke-width="30" stroke-linecap="round"/><path d="${d}" fill="none" stroke="var(--card)" stroke-width="3" stroke-dasharray="3 14" stroke-linecap="round"/>`;
   if(c>0)s+=`<path d="${segPath(c)}" fill="none" stroke="var(--ok)" stroke-width="12" stroke-linecap="round" opacity=".85"/>`;
@@ -108,7 +131,7 @@ function viewMap(){
   ${V.hint?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Toque em qualquer parada para fazer primeiro</span></div>`:""}
   ${mapHtml()}
   <div class="hud"><button data-act="pause" aria-label="Pausa">⏸ Pausa</button>
-  <button class="go" data-act="open">${fin?"🏁 Terminar o dia":`▶ Vamos! ${esc(S.cards[c].t)}`}</button>
+  <button class="go" data-act="open">${fin?"🏁 Terminar o dia":"▶ Vamos!"}</button>
   <button data-act="mish" aria-label="Mudou algo">☁️</button><button data-act="cfg" aria-label="Ajustes">⚙</button></div>`;
 }
 function viewScene(){
