@@ -14,7 +14,7 @@ html,body{height:100%;margin:0}
 *{box-sizing:border-box}
 body{background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:400 calc(18px*var(--fs,1))/1.5 Lexend,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
 h1,h2{margin:0;font-weight:600}
-#app{position:fixed;inset:0;overflow-y:auto;padding:env(safe-area-inset-top,0px) 0 130px}
+#app{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;padding:env(safe-area-inset-top,0px) 0 130px}
 button{font:inherit;cursor:pointer;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:10px 16px;min-height:52px}
 button:focus-visible,input:focus-visible{outline:4px solid var(--ok);outline-offset:2px}
 button.go{background:var(--accent);border-color:var(--accent);color:var(--onaccent);font-weight:600;font-size:1.1em;box-shadow:0 5px 0 rgba(0,0,0,.15)}
@@ -49,7 +49,7 @@ ol.steps{margin:6px 0 0;padding-left:22px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .sub{color:var(--soft);margin:0}
 .top{left:0;right:0;max-width:540px;margin:0 auto;padding:0 12px}
-.map{margin-top:70px}
+.map{margin-top:70px;overflow:visible}
 body::before{content:"";position:fixed;left:-10%;right:-10%;bottom:-8vh;height:32vh;background:var(--ground);opacity:.5;border-radius:50% 50% 0 0;z-index:-1}
 .stage{background:radial-gradient(circle at 35% 30%,var(--sky2),var(--card));box-shadow:0 8px 0 var(--line)}
 .bubble:after{content:"";position:absolute;left:28px;bottom:-12px;width:20px;height:20px;background:var(--card);border-right:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(45deg)}
