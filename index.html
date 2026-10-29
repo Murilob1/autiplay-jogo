@@ -144,7 +144,7 @@ function mapHtml(){
 }
 function viewMap(){
   const c=cur(),n=S.cards.length,fin=c>=n;
-  return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">🌱 ${S.seeds} · 🌻 Jardim</button><button data-act="village" aria-label="Vilarejo">🏘️</button><button data-act="edit">✎ Meu mapa</button></div>
+  return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">${S.gmode==="seeds"?`🌱 ${S.seeds} · `:""}🌻 Jardim</button><button data-act="village" aria-label="Vilarejo">🏘️</button><button data-act="edit">✎ Meu mapa</button></div>
   ${V.undo?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Caminho novo criado <button data-act="undo" style="min-height:40px;padding:4px 12px">Desfazer</button></span></div>`:""}
   ${V.hint?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Toque em qualquer parada para fazer primeiro</span></div>`:""}
   ${mapHtml()}
@@ -156,7 +156,7 @@ function viewScene(){
   const n=S.cards.length,c=V.done&&V.last!=null?V.last:(V.sel!=null?V.sel:cur());
   if(c>=n)return `<div class="center pop"><div class="stage">🏁</div><div class="bubble"><b>${S.mascot} Você chegou ao fim do dia!</b><p class="sub">Todas as paradas estão feitas. Quando quiser, comece outro dia.</p></div><button class="go" data-act="newday">Começar outro dia</button><button data-act="map">Voltar ao mapa</button></div>`;
   const k=S.cards[c],next=S.cards.find((x,j)=>!x.done&&j!==c);
-  if(V.done)return `<div class="center pop"><div class="stage">⭐</div><div class="bubble"><b>${S.mascot} Muito bem!</b><p class="sub">Você terminou: ${esc(k.t)}. +1 🌱</p><p class="sub">${next?`Próxima parada: ${next.e} ${esc(next.t)}`:"Próxima parada: 🏁 Fim do dia"}</p></div><button class="go" data-act="cont">Continuar o mapa</button></div>`;
+  if(V.done)return `<div class="center pop"><div class="stage">⭐</div><div class="bubble"><b>${S.mascot} Muito bem!</b><p class="sub">Você terminou: ${esc(k.t)}.${S.gmode==="seeds"?" +1 🌱":""}</p><p class="sub">${next?`Próxima parada: ${next.e} ${esc(next.t)}`:"Próxima parada: 🏁 Fim do dia"}</p></div><button class="go" data-act="cont">Continuar o mapa</button></div>`;
   return `<div class="center pop"><div class="stage" aria-hidden="true">${k.e}</div><div class="bubble"><b>${S.mascot} Parada ${c+1} de ${n}: ${esc(k.t)}</b><ol class="steps"><li>Faça esta etapa no seu tempo.</li><li>Quando terminar, toque em “Fiz!”.</li></ol><p class="sub">Depois: ${next?`${next.e} ${esc(next.t)}`:"🏁 Fim do dia"}</p></div>
   <button class="go" data-act="did">✔ Fiz!</button>${S.voice?`<button data-act="say">🔊 Ouvir</button>`:""}<button data-act="map">← Voltar ao mapa</button><p class="sub">Sem pressa. Não tem tempo limite.</p></div>`;
 }
@@ -195,7 +195,7 @@ function viewCfg(){
   <div class="card"><b>Jardim</b><div class="row" style="margin-top:8px">${b("gmode","simple","Simples: presentes automáticos",S.gmode!=="seeds")}${b("gmode","seeds","Com sementes e loja",S.gmode==="seeds")}</div></div>
   ${S.gmode!=="seeds"?`<div class="card"><b>Próximo presente</b><div class="row" style="margin-top:8px">${b("shownext","1","Mostrar",S.showNext)}${b("shownext","0","Esconder",!S.showNext)}</div></div>`:""}
   <div class="card"><b>Sequência de dias</b><div class="row" style="margin-top:8px">${b("streak","1","Mostrar",S.showStreak)}${b("streak","0","Esconder",!S.showStreak)}</div></div>
-  <p class="sub">Nada toca sozinho. Nada pisca e nada tem tempo.</p><button class="go" data-act="map">Pronto</button></div>`;
+  <p class="sub">Nada toca sozinho e nada tem tempo. No modo calmo, nada se mexe.</p><button class="go" data-act="map">Pronto</button></div>`;
 }
 function say(t){if(!S.voice||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";u.rate=.9;speechSynthesis.speak(u)}catch(e){console.warn("Voz indisponível",e)}}
 const SHOP=[{id:"tulipa",e:"🌷",n:"Tulipa",c:5,g:5},{id:"arvore",e:"🌳",n:"Árvore",c:8,g:15},{id:"abelha",e:"🐝",n:"Abelha",c:10,g:25},{id:"borboleta",e:"🦋",n:"Borboleta",c:12,g:40},{id:"fonte",e:"⛲",n:"Fonte",c:20,g:60}];
@@ -305,7 +305,7 @@ function viewVillage(){
   <div class="row" style="width:100%;max-width:460px;justify-content:space-between"><h2 style="margin:0">Meus amigos</h2><button data-act="village">🔄 Atualizar</button></div>${reqs}${fr||'<p class="sub">Você ainda não tem amigos no vilarejo.</p>'}`);
 }
 function viewPrint(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1 class="noprint">🖨 Cartões da rotina</h1><p class="sub noprint">Imprima e cole onde quiser. Cada cartão é uma parada.</p><div class="pcards" style="width:100%;max-width:640px">${S.cards.map((c,i)=>`<div class="pc card"><div style="font-size:3rem">${c.e}</div><b>${i+1}. ${esc(c.t)}</b></div>`).join("")}</div><button class="go noprint" data-act="doprint">🖨 Imprimir</button><button class="noprint" data-act="map">← Voltar ao mapa</button></div>`}
-function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. Nada pisca e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Os dados ficam só neste aparelho.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
+function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. As animações são suaves, o modo calmo para todo movimento e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Sua rotina fica só neste aparelho. No Vilarejo, que é opcional, vão apenas o apelido, o personagem e, se você deixar, o progresso.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
 function viewPause(){
   return `<div class="center pop" style="position:fixed;inset:0;background:var(--sky1);z-index:20"><div class="breath" aria-hidden="true"></div><div class="bubble"><b>${S.mascot} Pausa.</b><p class="sub">Respire devagar. O jogo espera por você.</p></div><button class="go" data-act="resume">▶ Voltar ao jogo</button><button data-act="title">Sair para o início</button></div>`;
 }
