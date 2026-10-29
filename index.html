@@ -6,10 +6,10 @@
 <title>Aventura da Rotina</title>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#4f625f;--onaccent:#ffffff;--edge:#6f857f;--card:#fffdf6;--line:#c9d8d2;--accent:#4f63c9;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#aab8ff;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
-:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#5a5278;--onaccent:#ffffff;--edge:#847a9e;--card:#fffafc;--line:#d6cce8;--accent:#7a4fa8;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
-:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#aab8ff;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
+:root{--sky1:#dde9e4;--sky2:#f3ede1;--ink:#2f3b39;--soft:#55665f;--card:#fbf8f2;--line:#d3ddd6;--accent:#3f7f78;--onaccent:#ffffff;--edge:#7a8f88;--ok:#86b79f;--ground:#bdd8c4;--path:#ecd9b0;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a37;--sky2:#2a3445;--ink:#ecefe9;--soft:#aab5bd;--card:#2b3645;--line:#3b4757;--accent:#9fd0c3;--onaccent:#17222a;--edge:#8794a1;--ok:#6fae96;--ground:#2f4a47;--path:#55607a;color-scheme:dark}}
+:root[data-theme=dusk]{--sky1:#e6dfee;--sky2:#f5e8e4;--ink:#3a3350;--soft:#5d5578;--card:#fcf8fa;--line:#dcd3e6;--accent:#7a5e9c;--onaccent:#ffffff;--edge:#8a7fa3;--ok:#8dbba9;--ground:#cdd9c8;--path:#f1ddd4}
+:root[data-theme=night]{--sky1:#1f2a37;--sky2:#2a3445;--ink:#ecefe9;--soft:#aab5bd;--card:#2b3645;--line:#3b4757;--accent:#9fd0c3;--onaccent:#17222a;--edge:#8794a1;--ok:#6fae96;--ground:#2f4a47;--path:#55607a;color-scheme:dark}
 html,body{height:100%;margin:0}
 *{box-sizing:border-box}
 body{background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:400 calc(18px*var(--fs,1))/1.5 Lexend,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
@@ -64,6 +64,24 @@ button:active{transform:translateY(2px)}
 .garden{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;max-width:460px}.gd{aspect-ratio:1;border-radius:14px;background:var(--card);border:3px dashed var(--line);display:grid;place-items:center;font-size:1.5rem}.gd.on{border-style:solid;border-color:var(--ok)}.gd.today{border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
 :root[data-contrast]{--ink:#000;--soft:#222;--onaccent:#fff;--edge:#000;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
 @media print{body{overflow:visible;background:#fff}#app{position:static;overflow:visible;padding:0}.noprint,button,.hud,.top{display:none!important}.pcards{grid-template-columns:repeat(3,1fr)}.pc{border:3px solid #000;border-radius:16px;text-align:center;break-inside:avoid;background:#fff;color:#000}}
+
+/* papel recortado: camadas suaves, formas orgânicas, cores calmas */
+h1{font-size:1.75rem;letter-spacing:-.01em}
+.center h1{font-size:2rem}
+.card{border:0;border-radius:30px;box-shadow:0 2px 0 rgba(255,255,255,.7) inset,0 7px 0 -3px var(--line),0 18px 22px -18px rgba(47,59,57,.35)}
+button{border:3px solid transparent;border-radius:999px;box-shadow:0 2px 0 rgba(255,255,255,.6) inset,0 4px 0 var(--line)}
+button.go{box-shadow:0 2px 0 rgba(255,255,255,.3) inset,0 5px 0 rgba(0,0,0,.16)}
+.pill{border:0;box-shadow:0 2px 0 rgba(255,255,255,.6) inset,0 4px 0 var(--line)}
+input{border-width:2px;border-radius:18px}
+.bubble{border:0;border-radius:28px 28px 28px 8px;box-shadow:0 2px 0 rgba(255,255,255,.7) inset,0 6px 0 -3px var(--line),0 16px 20px -16px rgba(47,59,57,.3)}
+.bubble:after{display:none}
+.stage{border:0;border-radius:58% 42% 55% 45%/50% 55% 45% 50%;aspect-ratio:1;box-shadow:0 8px 0 var(--line),0 24px 30px -22px rgba(47,59,57,.4)}
+.hero-big{width:180px;height:180px;display:grid;place-items:center;font-size:5.5rem;background:var(--card);border-radius:55% 45% 52% 48%/48% 54% 46% 52%;box-shadow:0 8px 0 var(--line),0 24px 30px -22px rgba(47,59,57,.4)}
+.opt .e{width:58px;height:58px;display:grid;place-items:center;flex:none;font-size:2rem;background:var(--sky2);border-radius:20px 26px 20px 26px}
+.gd{border-radius:50% 40% 50% 40%/40% 50% 40% 50%}
+.deco{filter:saturate(.72)}
+.on{border-color:var(--accent)!important}
+:root[data-contrast] .card,:root[data-contrast] button,:root[data-contrast] .bubble,:root[data-contrast] .pill{border:3px solid #000;box-shadow:none}
 </style>
 </head>
 <body>
@@ -263,6 +281,8 @@ async function friendAction(fn,fid){
   else{try{await loadFriends();n.msg=""}catch(e){console.error("Falha ao recarregar amigos",e)}}
   render();
 }
+const ROOFS=["#d9a79c","#a9c4d9","#b9d3a8","#d9c58f","#c3b0d9"];
+const house=nick=>{const c=ROOFS[[...String(nick)].reduce((t,x)=>t+x.charCodeAt(0),0)%ROOFS.length];return `<svg viewBox="0 0 80 80" width="72" height="72" aria-hidden="true" style="flex:none"><rect x="14" y="36" width="52" height="34" rx="5" fill="var(--card)" stroke="var(--edge)" stroke-width="2"/><path d="M7 41 L40 13 L73 41Z" fill="${c}"/><rect x="34" y="50" width="12" height="20" rx="4" fill="${c}"/><rect x="20" y="45" width="9" height="9" rx="2" fill="#cfe3ec"/><rect x="51" y="45" width="9" height="9" rx="2" fill="#cfe3ec"/></svg>`};
 function viewVillage(){
   const n=V.net,back='<button data-act="map">← Voltar ao mapa</button>',msg=n.msg?`<div class="bubble">${esc(n.msg)}</div>`:"";
   const wrap=b=>`<div class="center pop" style="justify-content:flex-start;padding-top:70px"><h1>🏘️ Vilarejo</h1>${msg}${b}${back}</div>`;
@@ -273,11 +293,11 @@ function viewVillage(){
   const p=n.profile;
   const prog=f=>f.days==null?"Não está mostrando o progresso":(f.stop_index>=f.stop_total?`Terminou o dia 🏁 · 🌻 ${f.days} dias`:`Parada ${f.stop_index+1} de ${f.stop_total} · 🌻 ${f.days} dias`);
   const reqs=n.reqs.map(r=>`<div class="card row"><span style="font-size:2rem">${esc(r.avatar)}</span><span style="flex:1"><b>${esc(r.nick)}</b><br><span class="sub">quer ser seu amigo</span></span><button class="go" data-act="accept" data-id="${r.fid}">Aceitar</button><button data-act="rmf" data-id="${r.fid}">Agora não</button></div>`).join("");
-  const fr=n.friends.map(f=>`<div class="card row"><span style="font-size:2.2rem">🏠</span><span style="font-size:2rem">${esc(f.avatar)}</span><span style="flex:1"><b>${esc(f.nick)}</b><br><span class="sub">${prog(f)}</span></span><button data-act="rmf" data-id="${f.fid}" aria-label="Remover amigo">🗑</button></div>`).join("");
+  const fr=n.friends.map(f=>`<div class="card row">${house(f.nick)}<span style="font-size:2rem">${esc(f.avatar)}</span><span style="flex:1"><b>${esc(f.nick)}</b><br><span class="sub">${prog(f)}</span></span><button data-act="rmf" data-id="${f.fid}" aria-label="Remover amigo">🗑</button></div>`).join("");
   return wrap(`<div class="card"><b>${esc(p.avatar)} ${esc(p.nick)}</b><p class="sub" style="margin:6px 0">Seu código para amigos:</p><span style="font-weight:600;font-size:1.6em;letter-spacing:.12em;background:var(--sky2);border:3px solid var(--line);border-radius:12px;padding:2px 14px;display:inline-block">${esc(p.code)}</span>
   <p class="sub" style="margin:10px 0 6px">Mostrar meu progresso para amigos:</p><div class="row"><button data-act="share" data-v="1" class="${p.share_progress?"on":""}">Mostrar</button><button data-act="share" data-v="0" class="${p.share_progress?"":"on"}">Esconder</button></div></div>
   <div class="card"><b>Adicionar amigo</b><div class="row" style="margin-top:8px"><input id="fcode" maxlength="6" placeholder="Código" style="flex:1;text-transform:uppercase"><button class="go" data-act="addf">Pedir</button></div></div>
-  ${reqs}${fr||'<p class="sub">Você ainda não tem amigos no vilarejo.</p>'}`);
+  <div class="row" style="width:100%;max-width:460px;justify-content:space-between"><h2 style="margin:0">Meus amigos</h2><button data-act="village">🔄 Atualizar</button></div>${reqs}${fr||'<p class="sub">Você ainda não tem amigos no vilarejo.</p>'}`);
 }
 function viewPrint(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1 class="noprint">🖨 Cartões da rotina</h1><p class="sub noprint">Imprima e cole onde quiser. Cada cartão é uma parada.</p><div class="pcards" style="width:100%;max-width:640px">${S.cards.map((c,i)=>`<div class="pc card"><div style="font-size:3rem">${c.e}</div><b>${i+1}. ${esc(c.t)}</b></div>`).join("")}</div><button class="go noprint" data-act="doprint">🖨 Imprimir</button><button class="noprint" data-act="map">← Voltar ao mapa</button></div>`}
 function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. Nada pisca e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Os dados ficam só neste aparelho.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
