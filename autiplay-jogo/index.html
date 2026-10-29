@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aventura da Rotina</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#6c7f7c;--card:#fffdf6;--line:#c9d8d2;--accent:#e5894f;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
+:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#7a7194;--card:#fffafc;--line:#d6cce8;--accent:#d9778f;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
+:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
+html,body{height:100%;margin:0}
+*{box-sizing:border-box}
+body{background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:400 calc(18px*var(--fs,1))/1.5 Lexend,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
+h1,h2{margin:0;font-weight:600}
+#app{position:fixed;inset:0;overflow-y:auto;padding:env(safe-area-inset-top,0px) 0 130px}
+button{font:inherit;cursor:pointer;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:10px 16px;min-height:52px}
+button:focus-visible,input:focus-visible{outline:4px solid var(--ok);outline-offset:2px}
+button.go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;font-size:1.1em;box-shadow:0 5px 0 rgba(0,0,0,.15)}
+button.go:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+input{font:inherit;width:100%;border:3px solid var(--line);border-radius:16px;padding:10px 12px;background:var(--card);color:var(--ink);min-height:52px}
+.center{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 18px;text-align:center}
+.hero-big{font-size:6.5rem;line-height:1}
+.hud{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--sky2) 40%)}
+.top{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;z-index:5;pointer-events:none}
+.top>*{pointer-events:auto}
+.pill{background:var(--card);border:3px solid var(--line);border-radius:99px;padding:6px 16px;font-weight:600}
+.map{display:block;margin:0 auto;max-width:520px;width:100%}
+.stage{width:min(78vw,300px);aspect-ratio:1;border-radius:50%;background:var(--card);border:6px solid var(--line);display:grid;place-items:center;font-size:7rem}
+.bubble{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:14px 18px;max-width:440px;position:relative;text-align:left}
+.bubble b{font-weight:600}
+ol.steps{margin:6px 0 0;padding-left:22px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:14px;width:100%;max-width:460px;text-align:left}
+.opt{display:flex;gap:12px;align-items:center;width:100%;max-width:460px;text-align:left}
+.opt .e{font-size:2.2rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.emojis{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;width:100%}
+.emojis button{font-size:1.4rem;padding:4px;min-height:44px}
+.on{border-color:var(--accent)!important;background:var(--sky2)}
+.breath{width:150px;height:150px;border-radius:50%;background:var(--ok);opacity:.85;animation:br 8s ease-in-out infinite}
+@keyframes br{0%,100%{transform:scale(.7)}50%{transform:scale(1.15)}}
+.ring{animation:rg 2.4s ease-in-out infinite}
+@keyframes rg{50%{opacity:.35}}
+.hero{transition:transform 1.4s ease-in-out}
+.pop{animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.94);opacity:.4}}
+:root[data-calm] *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sub{color:var(--soft);margin:0}
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.garden{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;max-width:460px}.gd{aspect-ratio:1;border-radius:14px;background:var(--card);border:3px dashed var(--line);display:grid;place-items:center;font-size:1.5rem}.gd.on{border-style:solid;border-color:var(--ok)}.gd.today{border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
+:root[data-contrast]{--ink:#000;--soft:#222;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
+@media print{body{overflow:visible;background:#fff}#app{position:static;overflow:visible;padding:0}.noprint,button,.hud,.top{display:none!important}.pcards{grid-template-columns:repeat(3,1fr)}.pc{border:3px solid #000;border-radius:16px;text-align:center;break-inside:avoid;background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const EM=["⏰","🛏️","🪥","🥣","👕","🎒","🚌","🏫","📚","🍎","🧩","🎮","🚿","🏠","🌳","💤"];
+const MASC=["🦊","🐢","🐼","🦉","🐸","🦄"];
+const MISH=[
+ {e:"🕒",t:"A aula começa mais tarde",o:[["💤","Descansar um pouco"],["🗣️","Combinar o novo horário"],["📚","Ler algo que eu gosto"]]},
+ {e:"🌧️",t:"Está chovendo",o:[["☂️","Pegar guarda-chuva"],["🚗","Combinar carona"],["🧥","Vestir capa de chuva"]]},
+ {e:"👩‍🏫",t:"Tem alguém diferente na aula",o:[["👋","Dizer oi para a pessoa nova"],["🧸","Levar meu objeto de conforto"],["🌿","Fazer uma pausa de calma antes"]]},
+ {e:"🚌",t:"O ônibus atrasou",o:[["🫧","Respirar devagar e esperar"],["💬","Avisar que vou chegar mais tarde"],["🗺️","Pedir ajuda com outro caminho"]]}];
+const DEF=[["⏰","Acordar"],["🪥","Escovar os dentes"],["🥣","Tomar café"],["🎒","Arrumar a mochila"],["🏫","Ir para a escola"],["🏠","Voltar para casa"]];
+const uid=()=>Math.random().toString(36).slice(2,8);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],owned:[],showStreak:true};
+const KEY="aventura-jogo-v1";
+try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)}}catch(e){console.warn("Storage vazio",e)}
+let V={screen:"title",undo:null,paused:false,done:false,fork:null,prev:null,msg:"",draft:{e:EM[0],t:""}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const cur=()=>{const i=S.cards.findIndex(c=>!c.done);return i<0?S.cards.length:i};
+const pos=i=>({x:180+95*Math.sin(i*1.25),y:100+i*125});
+function look(){const r=document.documentElement;S.theme?r.setAttribute("data-theme",S.theme):r.removeAttribute("data-theme");S.calm?r.setAttribute("data-calm",""):r.removeAttribute("data-calm");S.contrast?r.setAttribute("data-contrast",""):r.removeAttribute("data-contrast");r.style.setProperty("--fs",S.fs)}
+function segPath(k){let d=`M${pos(0).x} ${pos(0).y}`;for(let i=1;i<=k;i++){const a=pos(i-1),b=pos(i);d+=` C${a.x} ${a.y+60} ${b.x} ${b.y-60} ${b.x} ${b.y}`}return d}
+function mapHtml(){
+  const n=S.cards.length,c=cur(),H=100+(n+1)*125+60;
+  let s=`<svg class="map" viewBox="0 0 360 ${H}" role="img" aria-label="Mapa da aventura"><rect y="${H-180}" width="360" height="180" fill="var(--ground)" opacity=".5" rx="60"/>`;
+  for(let i=0;i<=n;i++){s+=`<text x="${i%2?36:324}" y="${pos(i).y+40}" font-size="34" text-anchor="middle">🌲</text><text x="${i%2?290:50}" y="${pos(i).y-30}" font-size="30" text-anchor="middle" opacity=".7">☁️</text>`}
+  s+=`<path d="${segPath(n)}" fill="none" stroke="var(--path)" stroke-width="26" stroke-linecap="round"/><path d="${segPath(n)}" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>`;
+  if(c>0)s+=`<path d="${segPath(c)}" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" opacity=".8"/>`;
+  const all=[...S.cards,{e:"🏁",t:"Fim do dia",done:false,goal:true}];
+  all.forEach((k,i)=>{const p=pos(i),now=i===c,done=k.done;
+    s+=`<g ${now&&!k.goal||k.goal&&c===n?'role="button" tabindex="0" data-act="open"':""} style="cursor:pointer">${now?`<circle class="ring" cx="${p.x}" cy="${p.y}" r="42" fill="none" stroke="var(--accent)" stroke-width="5"/>`:""}<circle cx="${p.x}" cy="${p.y}" r="32" fill="${done?"var(--ok)":"var(--card)"}" stroke="${now?"var(--accent)":"var(--line)"}" stroke-width="4"/><text x="${p.x}" y="${p.y+11}" font-size="32" text-anchor="middle" opacity="${done||now||k.goal?1:.55}">${done?"⭐":k.e}</text><text x="${p.x}" y="${p.y+58}" font-size="14" text-anchor="middle" fill="var(--ink)">${esc(k.t)}</text></g>`});
+  const from=pos(V.prev!=null?V.prev:c),to=pos(c);
+  s+=`<g class="hero" id="hero" style="transform:translate(${from.x+30}px,${from.y-56}px)"><text font-size="40" text-anchor="middle">${S.mascot}</text></g></svg>`;
+  return s;
+}
+function viewMap(){
+  const c=cur(),n=S.cards.length,fin=c>=n;
+  return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">🌱 ${S.seeds} · 🌻 Jardim</button><button data-act="edit">✎ Meu mapa</button></div>
+  ${V.undo?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Caminho novo criado <button data-act="undo" style="min-height:40px;padding:4px 12px">Desfazer</button></span></div>`:""}
+  ${mapHtml()}
+  <div class="hud"><button data-act="pause" aria-label="Pausa">⏸ Pausa</button>
+  <button class="go" data-act="open">${fin?"🏁 Terminar o dia":`▶ Vamos! ${esc(S.cards[c].t)}`}</button>
+  <button data-act="mish" aria-label="Mudou algo">☁️</button><button data-act="cfg" aria-label="Ajustes">⚙</button></div>`;
+}
+function viewScene(){
+  const c=cur(),n=S.cards.length;
+  if(c>=n)return `<div class="center pop"><div class="stage">🏁</div><div class="bubble"><b>${S.mascot} Você chegou ao fim do dia!</b><p class="sub">Todas as paradas estão feitas. Quando quiser, comece outro dia.</p></div><button class="go" data-act="newday">Começar outro dia</button><button data-act="map">Voltar ao mapa</button></div>`;
+  const k=S.cards[c],next=S.cards[c+1];
+  if(V.done)return `<div class="center pop"><div class="stage">⭐</div><div class="bubble"><b>${S.mascot} Muito bem!</b><p class="sub">Você terminou: ${esc(k.t)}. +1 🌱</p><p class="sub">${next?`Próxima parada: ${next.e} ${esc(next.t)}`:"Próxima parada: 🏁 Fim do dia"}</p></div><button class="go" data-act="cont">Continuar o mapa</button></div>`;
+  return `<div class="center pop"><div class="stage" aria-hidden="true">${k.e}</div><div class="bubble"><b>${S.mascot} Parada ${c+1} de ${n}: ${esc(k.t)}</b><ol class="steps"><li>Faça esta etapa no seu tempo.</li><li>Quando terminar, toque em “Fiz!”.</li></ol><p class="sub">Depois: ${next?`${next.e} ${esc(next.t)}`:"🏁 Fim do dia"}</p></div>
+  <button class="go" data-act="did">✔ Fiz!</button>${S.voice?`<button data-act="say">🔊 Ouvir</button>`:""}<button data-act="map">← Voltar ao mapa</button><p class="sub">Sem pressa. Não tem tempo limite.</p></div>`;
+}
+function viewMish(){
+  if(V.fork==null)return `<div class="center"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer.</p></div>${MISH.map((m,i)=>`<button class="opt card" data-act="fork" data-i="${i}"><span class="e">${m.e}</span>${m.t}</button>`).join("")}<button data-act="map">← Voltar ao mapa</button></div>`;
+  const m=MISH[V.fork];
+  return `<div class="center pop"><div class="stage" style="font-size:5rem">${m.e}</div><div class="bubble"><b>${S.mascot} ${m.t}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${o[0]}</span>${o[1]}</button>`).join("")}<button data-act="map">← Voltar ao mapa</button></div>`;
+}
+function viewEdit(){
+  const d=V.draft;
+  return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>✎ Meu mapa</h1><p class="sub">Monte as paradas do seu dia.</p>
+  ${S.cards.map(c=>`<div class="card row"><span style="font-size:1.8rem">${c.e}</span><span style="flex:1">${esc(c.t)}</span><button data-act="up" data-id="${c.id}" aria-label="Subir">↑</button><button data-act="dn" data-id="${c.id}" aria-label="Descer">↓</button><button data-act="del" data-id="${c.id}" aria-label="Remover">🗑</button></div>`).join("")}
+  <div class="card"><b>Nova parada</b><div class="emojis" style="margin:8px 0">${EM.map(e=>`<button data-act="pick" data-e="${e}" class="${d.e===e?"on":""}">${e}</button>`).join("")}</div><input id="txt" maxlength="30" placeholder="Ex.: Tomar banho" value="${esc(d.t)}"><button class="go" style="margin-top:10px" data-act="add">Adicionar parada</button></div>
+  <button data-act="newday">↺ Recomeçar o dia</button>
+  <button data-act="map">← Voltar ao mapa</button></div>`;
+}
+function viewCfg(){
+  const b=(a,v,t,on)=>`<button data-act="${a}" data-v="${v}" class="${on?"on":""}">${t}</button>`;
+  return `<div class="center"><h1>⚙ Ajustes</h1>
+  <div class="card"><b>Meu personagem</b><div class="row" style="margin-top:8px">${MASC.map(m=>b("masc",m,m,S.mascot===m)).join("")}</div></div>
+  <div class="card"><b>Cores</b><div class="row" style="margin-top:8px">${[["","Automático"],["day","Dia"],["dusk","Entardecer"],["night","Noite"]].map(([v,t])=>b("theme",v,t,(S.theme||"")===v)).join("")}</div></div>
+  <div class="card"><b>Tamanho do texto</b><div class="row" style="margin-top:8px">${[[1,"Normal"],[1.2,"Grande"],[1.4,"Enorme"]].map(([v,t])=>b("fs",v,t,S.fs===v)).join("")}</div></div>
+  <div class="card"><b>Movimento</b><div class="row" style="margin-top:8px">${b("calm","0","Com animações suaves",!S.calm)}${b("calm","1","Modo calmo (parado)",S.calm)}</div></div>
+  <div class="card"><b>Contraste</b><div class="row" style="margin-top:8px">${b("contrast","0","Normal",!S.contrast)}${b("contrast","1","Alto contraste",S.contrast)}</div></div>
+  <div class="card"><b>Voz</b><div class="row" style="margin-top:8px">${b("voice","0","Desligada",!S.voice)}${b("voice","1","Botão “Ouvir” nas cenas",S.voice)}</div></div>
+  <div class="card"><b>Sequência de dias</b><div class="row" style="margin-top:8px">${b("streak","1","Mostrar",S.showStreak)}${b("streak","0","Esconder",!S.showStreak)}</div></div>
+  <p class="sub">Nada toca sozinho. Nada pisca e nada tem tempo.</p><button class="go" data-act="map">Pronto</button></div>`;
+}
+function say(t){if(!S.voice||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";u.rate=.9;speechSynthesis.speak(u)}catch(e){console.warn("Voz indisponível",e)}}
+const SHOP=[{id:"tulipa",e:"🌷",n:"Tulipa",c:5},{id:"arvore",e:"🌳",n:"Árvore",c:8},{id:"abelha",e:"🐝",n:"Abelha",c:10},{id:"borboleta",e:"🦋",n:"Borboleta",c:12},{id:"fonte",e:"⛲",n:"Fonte",c:20}];
+const PETS=[[7,"🐰"],[30,"🦌"]];
+const dayKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function markDay(rest){const k=dayKey();if(!S.days.includes(k))S.days.push(k);if(rest&&!S.rest.includes(k))S.rest.push(k)}
+function streak(){const set=new Set(S.days),d=new Date();if(!set.has(dayKey(d)))d.setDate(d.getDate()-1);let n=0;while(set.has(dayKey(d))){n++;d.setDate(d.getDate()-1)}return n}
+function buy(id){const it=SHOP.find(x=>x.id===id);if(!it||S.owned.includes(id)||S.seeds<it.c)return;S.seeds-=it.c;S.owned.push(id)}
+function viewGarden(){
+ const cells=[],t=new Date();
+ for(let i=27;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);const k=dayKey(d),on=S.days.includes(k),rest=S.rest.includes(k);
+  cells.push(`<div class="gd ${on?"on":""} ${i===0?"today":""}" aria-label="${k}${on?(rest?", descanso":", dia na trilha"):""}">${on?(rest?"🌙":["🌸","🌼","🌻","🌷"][d.getDate()%4]):""}</div>`)}
+ const total=S.days.length,st=streak();
+ const pets=PETS.filter(p=>total>=p[0]).map(p=>p[1]).join(" ");
+ const owned=SHOP.filter(x=>S.owned.includes(x.id)).map(x=>x.e).join(" ");
+ return `<div class="center pop" style="justify-content:flex-start;padding-top:70px"><h1>🌻 Meu jardim</h1><p class="sub">Cada dia vira uma flor. Dia sem flor não tem problema: o jardim espera.</p>
+ <div class="row" style="justify-content:center"><span class="pill">🌱 ${S.seeds} sementes</span><span class="pill">📅 ${total} dias no total</span>${S.showStreak&&st>0?`<span class="pill">🔥 ${st} seguidos</span>`:""}</div>
+ <div class="garden" role="group" aria-label="Últimos 28 dias">${cells.join("")}</div>
+ <div class="card"><b>Meu cantinho</b><p style="font-size:2rem;margin:6px 0">${owned||"🌱"} ${pets}</p><p class="sub">${pets?"Seu bichinho chegou pelos seus dias na trilha.":"Com 7 dias no total chega um bichinho."}</p></div>
+ <button data-act="rest">🌙 Hoje é dia de descanso</button>
+ <div class="card"><b>Loja de sementes</b>${SHOP.map(x=>`<div class="row" style="margin-top:8px"><span style="font-size:1.8rem">${x.e}</span><span style="flex:1">${x.n} · ${x.c} 🌱</span>${S.owned.includes(x.id)?'<span class="sub">Você tem</span>':`<button data-act="buy" data-id="${x.id}" ${S.seeds<x.c?"disabled":""}>Pegar</button>`}</div>`).join("")}</div>
+ <button data-act="map">← Voltar ao mapa</button></div>`;
+}
+function viewPrint(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1 class="noprint">🖨 Cartões da rotina</h1><p class="sub noprint">Imprima e cole onde quiser. Cada cartão é uma parada.</p><div class="pcards" style="width:100%;max-width:640px">${S.cards.map((c,i)=>`<div class="pc card"><div style="font-size:3rem">${c.e}</div><b>${i+1}. ${esc(c.t)}</b></div>`).join("")}</div><button class="go noprint" data-act="doprint">🖨 Imprimir</button><button class="noprint" data-act="map">← Voltar ao mapa</button></div>`}
+function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. Nada pisca e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Os dados ficam só neste aparelho.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
+function viewPause(){
+  return `<div class="center pop" style="position:fixed;inset:0;background:var(--sky1);z-index:20"><div class="breath" aria-hidden="true"></div><div class="bubble"><b>${S.mascot} Pausa.</b><p class="sub">Respire devagar. O jogo espera por você.</p></div><button class="go" data-act="resume">▶ Voltar ao jogo</button><button data-act="title">Sair para o início</button></div>`;
+}
+function viewTitle(){
+  return `<div class="center pop"><div class="hero-big" aria-hidden="true">${S.mascot}</div><h1>Aventura da Rotina</h1><p class="sub">Siga a trilha, uma parada de cada vez.</p><button class="go" data-act="map">▶ Começar a aventura</button><div class="row" style="justify-content:center"><button data-act="edit">✎ Meu mapa</button><button data-act="goprint">🖨 Imprimir</button><button data-act="cfg">⚙ Ajustes</button><button data-act="why">ℹ Por que é acessível?</button></div></div>`;
+}
+function render(){
+  look();
+  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden}[V.screen]();
+  const app=document.getElementById("app");
+  app.innerHTML=v+(V.paused?viewPause():"");
+  if(V.screen==="map"){
+    const h=document.getElementById("hero"),p=pos(cur());
+    if(h&&V.prev!=null&&V.prev!==cur())requestAnimationFrame(()=>requestAnimationFrame(()=>{h.style.transform=`translate(${p.x+30}px,${p.y-56}px)`}));
+    V.prev=cur();
+    const svg=app.querySelector("svg");if(svg){const y=(pos(cur()).y/svg.viewBox.baseVal.height)*svg.getBoundingClientRect().height;app.scrollTop=Math.max(0,y-innerHeight/2)}
+  }
+}
+const go=s=>{V.screen=s;V.done=false;V.fork=null;V.paused=false};
+function move(id,d){const i=S.cards.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.cards.length)return;[S.cards[i],S.cards[j]]=[S.cards[j],S.cards[i]]}
+document.addEventListener("click",ev=>{
+  const b=ev.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act,id=b.dataset.id,i=+b.dataset.i,t=document.getElementById("txt");if(t)V.draft.t=t.value;
+  if(a==="map"){go("map")}else if(a==="open")go("scene");
+  else if(a==="did"){V.undo=null;S.cards[cur()].done=true;S.stars++;S.seeds++;markDay();V.done=true}
+  else if(a==="cont")go("map");
+  else if(a==="newday"){S.cards.forEach(c=>c.done=false);go("map");V.prev=null}
+  else if(a==="pause")V.paused=true;else if(a==="resume")V.paused=false;
+  else if(a==="title")go("title");
+  else if(a==="mish")go("mish");else if(a==="fork")V.fork=i;
+  else if(a==="goprint")go("print");else if(a==="why")go("why");
+  else if(a==="garden")go("garden");else if(a==="rest")markDay(true);else if(a==="buy")buy(id);else if(a==="streak")S.showStreak=b.dataset.v==="1";
+  else if(a==="doprint"){try{window.print()}catch(e){console.warn("Impressão indisponível",e)}}
+  else if(a==="say")say("Agora é: "+S.cards[cur()].t);
+  else if(a==="undo"){S.cards=JSON.parse(V.undo);V.undo=null}
+  else if(a==="path"){V.undo=JSON.stringify(S.cards);const o=MISH[V.fork].o[i];markDay();S.cards.splice(Math.min(cur()+1,S.cards.length),0,{id:uid(),e:o[0],t:o[1],done:false});go("map")}
+  else if(a==="edit")go("edit");else if(a==="cfg")go("cfg");
+  else if(a==="up")move(id,-1);else if(a==="dn")move(id,1);
+  else if(a==="del")S.cards=S.cards.filter(c=>c.id!==id);
+  else if(a==="pick")V.draft.e=b.dataset.e;
+  else if(a==="add"){const x=V.draft.t.trim();if(!x)return;S.cards.push({id:uid(),e:V.draft.e,t:x,done:false});V.draft={e:EM[0],t:""}}
+  else if(a==="masc")S.mascot=b.dataset.v;
+  else if(a==="theme")S.theme=b.dataset.v||null;
+  else if(a==="fs")S.fs=+b.dataset.v;
+  else if(a==="calm")S.calm=b.dataset.v==="1";
+  else if(a==="contrast")S.contrast=b.dataset.v==="1";
+  else if(a==="voice")S.voice=b.dataset.v==="1";
+  save();render();
+});
+document.addEventListener("keydown",ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.getAttribute&&ev.target.getAttribute("role")==="button"){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
+document.addEventListener("input",ev=>{if(ev.target.id==="txt")V.draft.t=ev.target.value});
+render();
+</script>
+</body>
+</html>
