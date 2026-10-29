@@ -56,6 +56,7 @@ ol.steps{margin:6px 0 0;padding-left:22px}
 </head>
 <body>
 <div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
 <script>
 const EM=["⏰","🛏️","🪥","🥣","👕","🎒","🚌","🏫","📚","🍎","🧩","🎮","🚿","🏠","🌳","💤"];
 const MASC=["🦊","🐢","🐼","🦉","🐸","🦄"];
@@ -70,8 +71,8 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],owned:[],showStreak:true};
 const KEY="aventura-jogo-v1";
 try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)}}catch(e){console.warn("Storage vazio",e)}
-let V={screen:"title",undo:null,paused:false,done:false,fork:null,prev:null,msg:"",draft:{e:EM[0],t:""}};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let V={screen:"title",undo:null,net:{ready:false,busy:false,uid:null,profile:null,friends:[],reqs:[],msg:""},paused:false,done:false,fork:null,prev:null,msg:"",draft:{e:EM[0],t:""}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncProgress()};
 const cur=()=>{const i=S.cards.findIndex(c=>!c.done);return i<0?S.cards.length:i};
 const pos=i=>({x:180+95*Math.sin(i*1.25),y:100+i*125});
 function look(){const r=document.documentElement;S.theme?r.setAttribute("data-theme",S.theme):r.removeAttribute("data-theme");S.calm?r.setAttribute("data-calm",""):r.removeAttribute("data-calm");S.contrast?r.setAttribute("data-contrast",""):r.removeAttribute("data-contrast");r.style.setProperty("--fs",S.fs)}
@@ -91,7 +92,7 @@ function mapHtml(){
 }
 function viewMap(){
   const c=cur(),n=S.cards.length,fin=c>=n;
-  return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">🌱 ${S.seeds} · 🌻 Jardim</button><button data-act="edit">✎ Meu mapa</button></div>
+  return `<div class="top"><button class="pill" data-act="garden" aria-label="Meu jardim">🌱 ${S.seeds} · 🌻 Jardim</button><button data-act="village" aria-label="Vilarejo">🏘️</button><button data-act="edit">✎ Meu mapa</button></div>
   ${V.undo?`<div class="top" style="top:calc(70px + env(safe-area-inset-top,0px));justify-content:center"><span class="pill">Caminho novo criado <button data-act="undo" style="min-height:40px;padding:4px 12px">Desfazer</button></span></div>`:""}
   ${mapHtml()}
   <div class="hud"><button data-act="pause" aria-label="Pausa">⏸ Pausa</button>
@@ -153,17 +154,96 @@ function viewGarden(){
  <div class="card"><b>Loja de sementes</b>${SHOP.map(x=>`<div class="row" style="margin-top:8px"><span style="font-size:1.8rem">${x.e}</span><span style="flex:1">${x.n} · ${x.c} 🌱</span>${S.owned.includes(x.id)?'<span class="sub">Você tem</span>':`<button data-act="buy" data-id="${x.id}" ${S.seeds<x.c?"disabled":""}>Pegar</button>`}</div>`).join("")}</div>
  <button data-act="map">← Voltar ao mapa</button></div>`;
 }
+const SB_URL="https://gaajzzjympccfiyhnjal.supabase.co",SB_KEY="sb_publishable_gpahitUqoYVeZu9U-MApZA_gyBBp1D9";
+let sb=null;
+try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){console.warn("Supabase indisponível",e)}
+const progressNow=()=>({days:S.days.length,stop_index:cur(),stop_total:S.cards.length});
+let syncTimer=null;
+function syncProgress(){
+  const n=V.net;if(!sb||!n.profile)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{sb.from("profiles").update({...progressNow(),updated_at:new Date().toISOString()}).eq("id",n.uid).then(r=>{if(r.error)console.error("Falha ao sincronizar progresso",r.error)})},800);
+}
+async function loadFriends(){
+  const [f,r]=await Promise.all([sb.rpc("friends_overview"),sb.rpc("friend_requests")]);
+  if(f.error)throw f.error;if(r.error)throw r.error;
+  V.net.friends=f.data||[];V.net.reqs=r.data||[];
+}
+async function netInit(){
+  const n=V.net;
+  if(!sb){n.msg="Sem conexão com o vilarejo agora.";return render()}
+  if(n.busy)return;
+  n.busy=true;n.msg="";render();
+  try{
+    let {data:{session}}=await sb.auth.getSession();
+    if(!session){const r=await sb.auth.signInAnonymously();if(r.error)throw r.error;session=r.data.session}
+    n.uid=session.user.id;
+    const p=await sb.from("profiles").select("*").eq("id",n.uid).maybeSingle();
+    if(p.error)throw p.error;
+    n.profile=p.data;
+    if(n.profile){await loadFriends();syncProgress()}
+    n.ready=true;
+  }catch(e){console.error("Falha ao conectar no Supabase",e);n.ready=false;n.msg="Não consegui conectar agora. Tente de novo mais tarde."}
+  n.busy=false;render();
+}
+async function createProfile(){
+  const n=V.net,input=document.getElementById("nick"),nick=((input&&input.value)||"").trim().slice(0,20);
+  if(!nick){n.msg="Escolha um apelido.";return render()}
+  const alpha="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  for(let t=0;t<5;t++){
+    const code=Array.from(crypto.getRandomValues(new Uint8Array(6)),x=>alpha[x%alpha.length]).join("");
+    const r=await sb.from("profiles").insert({id:n.uid,nick,avatar:S.mascot,code,...progressNow()}).select().single();
+    if(!r.error){n.profile=r.data;n.msg="";return render()}
+    if(r.error.code!=="23505"){console.error("Falha ao criar perfil",r.error);n.msg="Não deu para criar o perfil agora.";return render()}
+  }
+  n.msg="Tente de novo, não consegui gerar um código.";render();
+}
+async function setShare(on){
+  const n=V.net,r=await sb.from("profiles").update({share_progress:on}).eq("id",n.uid).select().single();
+  if(r.error){console.error("Falha ao mudar compartilhamento",r.error);n.msg="Não deu para mudar agora."}else n.profile=r.data;
+  render();
+}
+async function addFriend(){
+  const n=V.net,input=document.getElementById("fcode"),code=((input&&input.value)||"").trim().toUpperCase();
+  if(code.length!==6){n.msg="O código tem 6 letras e números.";return render()}
+  const r=await sb.rpc("request_friend",{friend_code:code});
+  const M={ok:"Pedido enviado. Seu amigo precisa aceitar.",not_found:"Não achei esse código.",self:"Esse é o seu próprio código.",exists:"Já existe um pedido ou amizade com essa pessoa."};
+  n.msg=r.error?"Não deu para enviar agora.":(M[r.data]||"Pronto.");
+  if(r.error)console.error("Falha ao pedir amizade",r.error);
+  render();
+}
+async function friendAction(fn,fid){
+  const n=V.net,r=await sb.rpc(fn,{fid:Number(fid)});
+  if(r.error){console.error("Falha em "+fn,r.error);n.msg="Não deu para fazer isso agora."}
+  else{try{await loadFriends();n.msg=""}catch(e){console.error("Falha ao recarregar amigos",e)}}
+  render();
+}
+function viewVillage(){
+  const n=V.net,back='<button data-act="map">← Voltar ao mapa</button>',msg=n.msg?`<div class="bubble">${esc(n.msg)}</div>`:"";
+  const wrap=b=>`<div class="center pop" style="justify-content:flex-start;padding-top:70px"><h1>🏘️ Vilarejo</h1>${msg}${b}${back}</div>`;
+  if(n.busy)return wrap('<p class="sub">Entrando no vilarejo…</p>');
+  if(!n.ready)return wrap('<button class="go" data-act="village">Tentar de novo</button>');
+  if(!n.profile)return wrap(`<div class="card"><b>Crie seu perfil</b><p class="sub">Use um apelido, não o seu nome completo. Seu personagem ${esc(S.mascot)} vai aparecer para seus amigos.</p><input id="nick" maxlength="20" placeholder="Apelido" style="margin:8px 0"><button class="go" data-act="mkprofile">Criar perfil</button></div>`);
+  const p=n.profile;
+  const prog=f=>f.days==null?"Não está mostrando o progresso":(f.stop_index>=f.stop_total?`Terminou o dia 🏁 · 🌻 ${f.days} dias`:`Parada ${f.stop_index+1} de ${f.stop_total} · 🌻 ${f.days} dias`);
+  const reqs=n.reqs.map(r=>`<div class="card row"><span style="font-size:2rem">${esc(r.avatar)}</span><span style="flex:1"><b>${esc(r.nick)}</b><br><span class="sub">quer ser seu amigo</span></span><button class="go" data-act="accept" data-id="${r.fid}">Aceitar</button><button data-act="rmf" data-id="${r.fid}">Agora não</button></div>`).join("");
+  const fr=n.friends.map(f=>`<div class="card row"><span style="font-size:2.2rem">🏠</span><span style="font-size:2rem">${esc(f.avatar)}</span><span style="flex:1"><b>${esc(f.nick)}</b><br><span class="sub">${prog(f)}</span></span><button data-act="rmf" data-id="${f.fid}" aria-label="Remover amigo">🗑</button></div>`).join("");
+  return wrap(`<div class="card"><b>${esc(p.avatar)} ${esc(p.nick)}</b><p class="sub" style="margin:6px 0">Seu código para amigos:</p><span style="font-weight:600;font-size:1.6em;letter-spacing:.12em;background:var(--sky2);border:3px solid var(--line);border-radius:12px;padding:2px 14px;display:inline-block">${esc(p.code)}</span>
+  <p class="sub" style="margin:10px 0 6px">Mostrar meu progresso para amigos:</p><div class="row"><button data-act="share" data-v="1" class="${p.share_progress?"on":""}">Mostrar</button><button data-act="share" data-v="0" class="${p.share_progress?"":"on"}">Esconder</button></div></div>
+  <div class="card"><b>Adicionar amigo</b><div class="row" style="margin-top:8px"><input id="fcode" maxlength="6" placeholder="Código" style="flex:1;text-transform:uppercase"><button class="go" data-act="addf">Pedir</button></div></div>
+  ${reqs}${fr||'<p class="sub">Você ainda não tem amigos no vilarejo.</p>'}`);
+}
 function viewPrint(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1 class="noprint">🖨 Cartões da rotina</h1><p class="sub noprint">Imprima e cole onde quiser. Cada cartão é uma parada.</p><div class="pcards" style="width:100%;max-width:640px">${S.cards.map((c,i)=>`<div class="pc card"><div style="font-size:3rem">${c.e}</div><b>${i+1}. ${esc(c.t)}</b></div>`).join("")}</div><button class="go noprint" data-act="doprint">🖨 Imprimir</button><button class="noprint" data-act="map">← Voltar ao mapa</button></div>`}
 function viewWhy(){return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>ℹ Por que é acessível?</h1><div class="card"><ul style="margin:0;padding-left:20px"><li>Sem tempo, sem pontos perdidos e sem ranking.</li><li>Cada pessoa monta e muda a própria rotina.</li><li>Mudanças aparecem como aviso antecipado, com várias opções válidas e botão para desfazer.</li><li>Cores, contraste, letra, animação e voz são ajustáveis. Nada pisca e nada toca sozinho.</li><li>A pausa está sempre no mesmo lugar.</li><li>Os dados ficam só neste aparelho.</li></ul></div><p class="sub">Protótipo da Missão 5. Vale testar com pessoas autistas, famílias e profissionais.</p><button class="go" data-act="map">Voltar</button></div>`}
 function viewPause(){
   return `<div class="center pop" style="position:fixed;inset:0;background:var(--sky1);z-index:20"><div class="breath" aria-hidden="true"></div><div class="bubble"><b>${S.mascot} Pausa.</b><p class="sub">Respire devagar. O jogo espera por você.</p></div><button class="go" data-act="resume">▶ Voltar ao jogo</button><button data-act="title">Sair para o início</button></div>`;
 }
 function viewTitle(){
-  return `<div class="center pop"><div class="hero-big" aria-hidden="true">${S.mascot}</div><h1>Aventura da Rotina</h1><p class="sub">Siga a trilha, uma parada de cada vez.</p><button class="go" data-act="map">▶ Começar a aventura</button><div class="row" style="justify-content:center"><button data-act="edit">✎ Meu mapa</button><button data-act="goprint">🖨 Imprimir</button><button data-act="cfg">⚙ Ajustes</button><button data-act="why">ℹ Por que é acessível?</button></div></div>`;
+  return `<div class="center pop"><div class="hero-big" aria-hidden="true">${S.mascot}</div><h1>Aventura da Rotina</h1><p class="sub">Siga a trilha, uma parada de cada vez.</p><button class="go" data-act="map">▶ Começar a aventura</button><div class="row" style="justify-content:center"><button data-act="edit">✎ Meu mapa</button><button data-act="village">🏘️ Vilarejo</button><button data-act="goprint">🖨 Imprimir</button><button data-act="cfg">⚙ Ajustes</button><button data-act="why">ℹ Por que é acessível?</button></div></div>`;
 }
 function render(){
   look();
-  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden}[V.screen]();
+  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden,village:viewVillage}[V.screen]();
   const app=document.getElementById("app");
   app.innerHTML=v+(V.paused?viewPause():"");
   if(V.screen==="map"){
@@ -186,7 +266,13 @@ document.addEventListener("click",ev=>{
   else if(a==="title")go("title");
   else if(a==="mish")go("mish");else if(a==="fork")V.fork=i;
   else if(a==="goprint")go("print");else if(a==="why")go("why");
-  else if(a==="garden")go("garden");else if(a==="rest")markDay(true);else if(a==="buy")buy(id);else if(a==="streak")S.showStreak=b.dataset.v==="1";
+  else if(a==="garden")go("garden");
+  else if(a==="village"){go("village");netInit()}
+  else if(a==="mkprofile"){createProfile();return}
+  else if(a==="share"){setShare(b.dataset.v==="1");return}
+  else if(a==="addf"){addFriend();return}
+  else if(a==="accept"){friendAction("accept_friend",id);return}
+  else if(a==="rmf"){friendAction("remove_friend",id);return}else if(a==="rest")markDay(true);else if(a==="buy")buy(id);else if(a==="streak")S.showStreak=b.dataset.v==="1";
   else if(a==="doprint"){try{window.print()}catch(e){console.warn("Impressão indisponível",e)}}
   else if(a==="say")say("Agora é: "+S.cards[cur()].t);
   else if(a==="undo"){S.cards=JSON.parse(V.undo);V.undo=null}
