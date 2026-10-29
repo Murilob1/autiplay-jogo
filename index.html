@@ -6,10 +6,10 @@
 <title>Aventura da Rotina</title>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#4f625f;--onaccent:#2b2118;--edge:#6f857f;--card:#fffdf6;--line:#c9d8d2;--accent:#e5894f;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
-:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#5a5278;--onaccent:#2b2118;--edge:#847a9e;--card:#fffafc;--line:#d6cce8;--accent:#d9778f;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
-:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#f0a463;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
+:root{--sky1:#cfe8e2;--sky2:#f6efd9;--ink:#2e3b3a;--soft:#4f625f;--onaccent:#ffffff;--edge:#6f857f;--card:#fffdf6;--line:#c9d8d2;--accent:#4f63c9;--ok:#6fae91;--ground:#b9d8b0;--path:#f3e3bd;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#aab8ff;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}}
+:root[data-theme=dusk]{--sky1:#e3dbf0;--sky2:#fbe9e4;--ink:#3a3350;--soft:#5a5278;--onaccent:#ffffff;--edge:#847a9e;--card:#fffafc;--line:#d6cce8;--accent:#7a4fa8;--ok:#79b3a0;--ground:#cbd9c4;--path:#f4e1da}
+:root[data-theme=night]{--sky1:#1f2a3d;--sky2:#2c3650;--ink:#eef0f4;--soft:#a5afc4;--onaccent:#1d2230;--edge:#8793ad;--card:#2b3550;--line:#43506f;--accent:#aab8ff;--ok:#7fc7a6;--ground:#2f4a47;--path:#53607f;color-scheme:dark}
 html,body{height:100%;margin:0}
 *{box-sizing:border-box}
 body{background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:400 calc(18px*var(--fs,1))/1.5 Lexend,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
@@ -48,6 +48,12 @@ ol.steps{margin:6px 0 0;padding-left:22px}
 :root[data-calm] *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .sub{color:var(--soft);margin:0}
+.top{left:0;right:0;max-width:540px;margin:0 auto;padding:0 12px}
+.map{margin-top:70px}
+body::before{content:"";position:fixed;left:-10%;right:-10%;bottom:-8vh;height:32vh;background:var(--ground);opacity:.5;border-radius:50% 50% 0 0;z-index:-1}
+.stage{background:radial-gradient(circle at 35% 30%,var(--sky2),var(--card));box-shadow:0 8px 0 var(--line)}
+.bubble:after{content:"";position:absolute;left:28px;bottom:-12px;width:20px;height:20px;background:var(--card);border-right:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(45deg)}
+button:active{transform:translateY(2px)}
 .pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .garden{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;max-width:460px}.gd{aspect-ratio:1;border-radius:14px;background:var(--card);border:3px dashed var(--line);display:grid;place-items:center;font-size:1.5rem}.gd.on{border-style:solid;border-color:var(--ok)}.gd.today{border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
 :root[data-contrast]{--ink:#000;--soft:#222;--onaccent:#fff;--edge:#000;--line:#000;--card:#fff;--sky1:#fff;--sky2:#fff;--accent:#a53f00;--ground:#e6e6e6;--path:#cfcfcf}
@@ -71,6 +77,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 let S={cards:DEF.map(([e,t])=>({id:uid(),e,t,done:false})),stars:0,mascot:"🦊",theme:null,calm:false,fs:1,contrast:false,voice:false,seeds:0,days:[],rest:[],owned:[],showStreak:true,consent:false};
 const KEY="aventura-jogo-v1";
 try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)}}catch(e){console.warn("Storage vazio",e)}
+if(!S.mish)S.mish=JSON.parse(JSON.stringify(MISH));
 let V={screen:"title",undo:null,net:{ready:false,busy:false,uid:null,profile:null,friends:[],reqs:[],msg:""},paused:false,done:false,fork:null,prev:null,msg:"",draft:{e:EM[0],t:""}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncProgress()};
 const cur=()=>{const i=S.cards.findIndex(c=>!c.done);return i<0?S.cards.length:i};
@@ -79,15 +86,19 @@ function look(){const r=document.documentElement;S.theme?r.setAttribute("data-th
 function segPath(k){let d=`M${pos(0).x} ${pos(0).y}`;for(let i=1;i<=k;i++){const a=pos(i-1),b=pos(i);d+=` C${a.x} ${a.y+60} ${b.x} ${b.y-60} ${b.x} ${b.y}`}return d}
 function mapHtml(){
   const n=S.cards.length,c=cur(),H=100+(n+1)*125+60;
-  let s=`<svg class="map" viewBox="0 0 360 ${H}" role="img" aria-label="Mapa da aventura"><rect y="${H-180}" width="360" height="180" fill="var(--ground)" opacity=".5" rx="60"/>`;
-  for(let i=0;i<=n;i++){s+=`<text x="${i%2?36:324}" y="${pos(i).y+40}" font-size="34" text-anchor="middle">🌲</text><text x="${i%2?290:50}" y="${pos(i).y-30}" font-size="30" text-anchor="middle" opacity=".7">☁️</text>`}
-  s+=`<path d="${segPath(n)}" fill="none" stroke="var(--path)" stroke-width="26" stroke-linecap="round"/><path d="${segPath(n)}" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>`;
-  if(c>0)s+=`<path d="${segPath(c)}" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" opacity=".8"/>`;
-  const all=[...S.cards,{e:"🏁",t:"Fim do dia",done:false,goal:true}];
-  all.forEach((k,i)=>{const p=pos(i),now=i===c,done=k.done;
-    s+=`<g ${!k.goal&&!done?`role="button" tabindex="0" data-act="open" data-i="${i}" aria-label="${esc(k.t)}"`:(k.goal&&c===n?'role="button" tabindex="0" data-act="open"':"")} style="cursor:pointer">${now?`<circle class="ring" cx="${p.x}" cy="${p.y}" r="42" fill="none" stroke="var(--accent)" stroke-width="5"/>`:""}<circle cx="${p.x}" cy="${p.y}" r="32" fill="${done?"var(--ok)":"var(--card)"}" stroke="${now?"var(--accent)":"var(--line)"}" stroke-width="4"/><text x="${p.x}" y="${p.y+11}" font-size="32" text-anchor="middle" opacity="${done||now||k.goal?1:.55}">${done?"⭐":k.e}</text><text x="${p.x}" y="${p.y+58}" font-size="14" text-anchor="middle" fill="var(--ink)">${esc(k.t)}</text></g>`});
-  const from=pos(V.prev!=null?V.prev:c),to=pos(c);
-  s+=`<g class="hero" id="hero" style="transform:translate(${from.x+30}px,${from.y-56}px)"><text font-size="40" text-anchor="middle">${S.mascot}</text></g></svg>`;
+  let s=`<svg class="map" viewBox="0 0 360 ${H}" role="img" aria-label="Mapa da aventura"><circle cx="296" cy="30" r="26" fill="#f6c76b" opacity=".9"/>`;
+  for(let i=0;i<=n;i++){const y=pos(i).y;
+    s+=`<ellipse cx="${i%2?-30:390}" cy="${y+50}" rx="120" ry="75" fill="var(--ground)" opacity=".5"/><text x="${i%2?34:326}" y="${y+30}" font-size="32" text-anchor="middle">${i%3?"🌲":"🌳"}</text><text x="${i%2?300:60}" y="${y-34}" font-size="30" text-anchor="middle" opacity=".75">☁️</text><text x="${i%2?96:262}" y="${y+84}" font-size="20" text-anchor="middle">${["🌼","🌷","🌸"][i%3]}</text>`}
+  const d=segPath(n);
+  s+=`<path d="${d}" fill="none" stroke="var(--line)" stroke-width="40" stroke-linecap="round" opacity=".7"/><path d="${d}" fill="none" stroke="var(--path)" stroke-width="30" stroke-linecap="round"/><path d="${d}" fill="none" stroke="var(--card)" stroke-width="3" stroke-dasharray="3 14" stroke-linecap="round"/>`;
+  if(c>0)s+=`<path d="${segPath(c)}" fill="none" stroke="var(--ok)" stroke-width="12" stroke-linecap="round" opacity=".85"/>`;
+  const all=[...S.cards,{e:"🏡",t:"Fim do dia",done:false,goal:true}];
+  all.forEach((k,i)=>{
+    const p=pos(i),now=i===c,done=k.done,lab=k.t.length>18?k.t.slice(0,17)+"…":k.t,lw=lab.length*8.5+24;
+    const act=!k.goal&&!done?`role="button" tabindex="0" data-act="open" data-i="${i}" aria-label="${esc(k.t)}"`:(k.goal&&c===n?'role="button" tabindex="0" data-act="open"':"");
+    s+=`<g ${act} style="cursor:pointer"><circle cx="${p.x}" cy="${p.y+5}" r="36" fill="#000" opacity=".18"/>${now?`<circle class="ring" cx="${p.x}" cy="${p.y}" r="46" fill="none" stroke="var(--accent)" stroke-width="5"/>`:""}<circle cx="${p.x}" cy="${p.y}" r="36" fill="${done?"var(--ok)":"var(--card)"}" stroke="${now?"var(--accent)":"var(--edge)"}" stroke-width="5"/><text x="${p.x}" y="${p.y+13}" font-size="36" text-anchor="middle" opacity="${done||now||k.goal?1:.6}">${done?"⭐":k.e}</text><rect x="${p.x-lw/2}" y="${p.y+44}" width="${lw}" height="26" rx="13" fill="var(--card)" stroke="var(--line)" stroke-width="2"/><text x="${p.x}" y="${p.y+62}" font-size="14" text-anchor="middle" fill="var(--ink)">${esc(lab)}</text></g>`});
+  const from=pos(V.prev!=null?V.prev:c);
+  s+=`<g class="hero" id="hero" style="transform:translate(${from.x+34}px,${from.y-58}px)"><text font-size="44" text-anchor="middle">${S.mascot}</text></g></svg>`;
   return s;
 }
 function viewMap(){
@@ -108,10 +119,20 @@ function viewScene(){
   return `<div class="center pop"><div class="stage" aria-hidden="true">${k.e}</div><div class="bubble"><b>${S.mascot} Parada ${c+1} de ${n}: ${esc(k.t)}</b><ol class="steps"><li>Faça esta etapa no seu tempo.</li><li>Quando terminar, toque em “Fiz!”.</li></ol><p class="sub">Depois: ${next?`${next.e} ${esc(next.t)}`:"🏁 Fim do dia"}</p></div>
   <button class="go" data-act="did">✔ Fiz!</button>${S.voice?`<button data-act="say">🔊 Ouvir</button>`:""}<button data-act="map">← Voltar ao mapa</button><p class="sub">Sem pressa. Não tem tempo limite.</p></div>`;
 }
+const IM=["🕒","🌧️","👩‍🏫","🚌","🔔","🤒","🎉","🔊","🚧","📅","🍽️","🧪"];
 function viewMish(){
-  if(V.fork==null)return `<div class="center"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer.</p></div>${MISH.map((m,i)=>`<button class="opt card" data-act="fork" data-i="${i}"><span class="e">${m.e}</span>${m.t}</button>`).join("")}<button data-act="map">← Voltar ao mapa</button></div>`;
-  const m=MISH[V.fork];
-  return `<div class="center pop"><div class="stage" style="font-size:5rem">${m.e}</div><div class="bubble"><b>${S.mascot} ${m.t}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${o[0]}</span>${o[1]}</button>`).join("")}<button class="opt card" data-act="reorder"><span class="e">🔀</span>Fazer outra parada primeiro</button><button data-act="map">← Voltar ao mapa</button></div>`;
+  if(V.fork==null)return `<div class="center" style="justify-content:flex-start;padding-top:70px"><div class="bubble"><b>${S.mascot} Mudou algo hoje?</b><p class="sub">Isto é um aviso antecipado: nada mudou ainda. Escolha o que pode acontecer, ou crie o seu.</p></div>${S.mish.map((m,i)=>`<div class="row" style="width:100%;max-width:460px;flex-wrap:nowrap"><button class="opt card" style="flex:1;width:auto" data-act="fork" data-i="${i}"><span class="e">${esc(m.e)}</span>${esc(m.t)}</button><button data-act="medit" data-i="${i}" aria-label="Editar imprevisto">✎</button><button data-act="mdel" data-i="${i}" aria-label="Apagar imprevisto">🗑</button></div>`).join("")}<button class="go" data-act="mnew">➕ Criar meu imprevisto</button><button data-act="mreset">↺ Recuperar os originais</button><button data-act="map">← Voltar ao mapa</button></div>`;
+  const m=S.mish[V.fork];
+  return `<div class="center pop"><div class="stage" style="font-size:5rem">${esc(m.e)}</div><div class="bubble"><b>${S.mascot} ${esc(m.t)}.</b><p class="sub">O caminho se dividiu. Escolha por onde seguir. Todos servem.</p></div>${m.o.map((o,i)=>`<button class="opt card" data-act="path" data-i="${i}"><span class="e">${esc(o[0])}</span>${esc(o[1])}</button>`).join("")}<button class="opt card" data-act="reorder"><span class="e">🔀</span>Fazer outra parada primeiro</button><button data-act="mish">← Voltar aos imprevistos</button></div>`;
+}
+function viewMform(){
+  const f=V.mform;
+  return `<div class="center" style="justify-content:flex-start;padding-top:70px"><h1>${f.i==null?"Criar imprevisto":"Editar imprevisto"}</h1><p class="sub">O que pode mudar? E o que a pessoa pode fazer?</p>
+  <div class="card"><b>Desenho</b><div class="emojis" style="margin:8px 0">${IM.map(e=>`<button data-act="mpick" data-e="${e}" class="${f.e===e?"on":""}">${e}</button>`).join("")}</div>
+  <label class="sub" for="mt">O que vai mudar?</label><input id="mt" maxlength="40" value="${esc(f.t)}" placeholder="Ex.: A aula acabou mais cedo"></div>
+  <div class="card"><b>Opções para seguir</b><p class="sub">Escreva de 1 a 3. Todas são válidas.</p>${f.o.map((o,k)=>`<div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="me${k}" maxlength="8" value="${esc(o[0])}" aria-label="Desenho da opção ${k+1}" style="width:72px;text-align:center"><input id="mo${k}" maxlength="40" value="${esc(o[1])}" placeholder="Opção ${k+1}" style="flex:1"></div>`).join("")}</div>
+  ${V.mmsg?`<div class="bubble">${esc(V.mmsg)}</div>`:""}
+  <button class="go" data-act="msave">Salvar</button><button data-act="mish">Cancelar</button></div>`;
 }
 function viewEdit(){
   const d=V.draft;
@@ -245,12 +266,12 @@ function viewTitle(){
 }
 function render(){
   look();
-  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden,village:viewVillage}[V.screen]();
+  const v={title:viewTitle,map:viewMap,scene:viewScene,mish:viewMish,edit:viewEdit,cfg:viewCfg,print:viewPrint,why:viewWhy,garden:viewGarden,village:viewVillage,mform:viewMform}[V.screen]();
   const app=document.getElementById("app");
   app.innerHTML=v+(V.paused?viewPause():"");
   if(V.screen==="map"){
     const h=document.getElementById("hero"),p=pos(cur());
-    if(h&&V.prev!=null&&V.prev!==cur())requestAnimationFrame(()=>requestAnimationFrame(()=>{h.style.transform=`translate(${p.x+30}px,${p.y-56}px)`}));
+    if(h&&V.prev!=null&&V.prev!==cur())requestAnimationFrame(()=>requestAnimationFrame(()=>{h.style.transform=`translate(${p.x+34}px,${p.y-58}px)`}));
     V.prev=cur();
     const svg=app.querySelector("svg");if(svg){const y=(pos(cur()).y/svg.viewBox.baseVal.height)*svg.getBoundingClientRect().height;app.scrollTop=Math.max(0,y-innerHeight/2)}
   }
@@ -260,6 +281,7 @@ function move(id,d){const i=S.cards.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.c
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("[data-act]");if(!b)return;
   const a=b.dataset.act,id=b.dataset.id,i=+b.dataset.i,t=document.getElementById("txt");if(t)V.draft.t=t.value;
+  if(V.screen==="mform"&&V.mform){const g=x=>document.getElementById(x),f=V.mform;if(g("mt"))f.t=g("mt").value;f.o.forEach((o,k)=>{if(g("me"+k))o[0]=g("me"+k).value;if(g("mo"+k))o[1]=g("mo"+k).value})}
   if(a==="map"){go("map")}else if(a==="open"){V.hint=false;go("scene");V.sel=b.dataset.i!=null?+b.dataset.i:null}
   else if(a==="did"){V.undo=null;const i2=V.sel!=null?V.sel:cur();S.cards[i2].done=true;V.last=i2;V.sel=null;S.stars++;S.seeds++;markDay();V.done=true}
   else if(a==="cont")go("map");
@@ -268,6 +290,14 @@ document.addEventListener("click",ev=>{
   else if(a==="title")go("title");
   else if(a==="mish")go("mish");else if(a==="fork")V.fork=i;
   else if(a==="reorder"){markDay();go("map");V.hint=true}
+  else if(a==="mnew"){go("mform");V.mform={i:null,e:IM[0],t:"",o:[["✨",""],["✨",""],["✨",""]]};V.mmsg=""}
+  else if(a==="medit"){const m=S.mish[i];go("mform");V.mform={i,e:m.e,t:m.t,o:[0,1,2].map(k=>m.o[k]?[m.o[k][0],m.o[k][1]]:["✨",""])};V.mmsg=""}
+  else if(a==="mdel"){S.mish.splice(i,1)}
+  else if(a==="mreset"){S.mish=JSON.parse(JSON.stringify(MISH))}
+  else if(a==="mpick")V.mform.e=b.dataset.e;
+  else if(a==="msave"){const f=V.mform,opts=f.o.filter(o=>o[1].trim()).map(o=>[o[0].trim()||"✨",o[1].trim()]);
+    if(!f.t.trim()||!opts.length){V.mmsg="Escreva o que vai mudar e pelo menos uma opção."}
+    else{const m={e:f.e,t:f.t.trim(),o:opts};if(f.i==null)S.mish.push(m);else S.mish[f.i]=m;go("mish")}}
   else if(a==="goprint")go("print");else if(a==="why")go("why");
   else if(a==="garden")go("garden");
   else if(a==="village"){go("village");if(S.consent)netInit()}
@@ -280,7 +310,7 @@ document.addEventListener("click",ev=>{
   else if(a==="doprint"){try{window.print()}catch(e){console.warn("Impressão indisponível",e)}}
   else if(a==="say")say("Agora é: "+S.cards[cur()].t);
   else if(a==="undo"){S.cards=JSON.parse(V.undo);V.undo=null}
-  else if(a==="path"){V.undo=JSON.stringify(S.cards);const o=MISH[V.fork].o[i];markDay();S.cards.splice(Math.min(cur()+1,S.cards.length),0,{id:uid(),e:o[0],t:o[1],done:false});go("map")}
+  else if(a==="path"){V.undo=JSON.stringify(S.cards);const o=S.mish[V.fork].o[i];markDay();S.cards.splice(Math.min(cur()+1,S.cards.length),0,{id:uid(),e:o[0],t:o[1],done:false});go("map")}
   else if(a==="edit")go("edit");else if(a==="cfg")go("cfg");
   else if(a==="up")move(id,-1);else if(a==="dn")move(id,1);
   else if(a==="del")S.cards=S.cards.filter(c=>c.id!==id);
